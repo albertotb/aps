@@ -205,7 +205,7 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
         modes = np.zeros(J, dtype=int)
         for jj in range(J):
             modes[jj], _ = innerAPS(d_given, a_values, a_util_f(),
-                                 a_prob_f(d_given), N_inner, burnin )
+                                 a_prob_f(), N_inner, burnin )
         p_d[i, :] = np.bincount(modes, minlength = len(a_values))/J
 
     d_sim = np.zeros(N_aps, dtype = int)

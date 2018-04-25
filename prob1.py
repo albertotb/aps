@@ -43,7 +43,7 @@ a_util = lambda a, theta: ua(ca[a, theta], e=10)
 def a_util_f():
     return lambda a, theta: ua(ca[a, theta], e=uniform.rvs(scale=20))
 
-def a_prob_f(d):
+def a_prob_f():
     def a_prob(d, a, size=1):
         return bernoulli.rvs(p=beta.rvs(a=alpha_values[d], b=beta_values[d]),
                              size=size) if a==1 else np.zeros(size, dtype=int)
