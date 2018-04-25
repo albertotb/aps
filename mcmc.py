@@ -2,6 +2,9 @@
 import numpy as np
 from scipy.integrate import quad
 
+def scale(x):
+    return (x - x.min())/(x.max() - x.min())
+
 def mcmc_atk_def(d_values, a_values, d_util, a_util, prob, n=1000):
     """ Computes the solution of an attacker-defender game using MCMC
 
