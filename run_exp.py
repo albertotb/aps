@@ -32,6 +32,18 @@ if __name__ == '__main__':
                 default='prob1',
                 choices=['prob1', 'prob2', 'prob1_v2'])
 
+    parser.add_argument('-a',
+                dest='alg',
+                help='algorithm',
+                default='mcmc',
+                choices=['mcmc', 'aps'])
+
+    parser.add_argument('-s',
+                dest='set',
+                help='setting',
+                default='atk_def',
+                choices=['atk_def', 'ara'])
+
     parser.add_argument('--mcmc',
                 type=int,
                 dest='mcmc',
@@ -71,57 +83,54 @@ if __name__ == '__main__':
     #---------------------------------------------------------------------------
     # Attacker-defender game
     #---------------------------------------------------------------------------
-    print('Game theory')
-    print('-' * 80)
+    if args.set == 'atk_def':
+        print('Game theory')
+        print('-' * 80)
 
-    # MCMC
-    print('MCMC')
-    with timer():
-        d_opt, a_opt = mcmc_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
-                                    p.prob, n=args.mcmc)
-    print(d_opt)
-    print(a_opt)
+        if args.alg == 'mcmc':
+            print('MCMC')
+            with timer():
+                d_opt, a_opt = mcmc_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
+                                            p.prob, n=args.mcmc)
+        elif args.alg == 'aps':
+            print('APS')
+            with timer():
+                d_opt, a_opt = aps_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
+                                           p.prob, N_aps=args.aps, burnin=args.burnin,
+                                           N_inner=args.aps_inner)
+        else:
+            print('Error')
 
-    # APS
-    print('APS')
-    with timer():
-        d_opt, a_opt = aps_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
-                                   p.prob, N_aps=args.aps, burnin=args.burnin,
-                                   N_inner=args.aps_inner)
-    print(d_opt)
-    print(a_opt)
+        print(d_opt)
+        print(a_opt)
 
     #---------------------------------------------------------------------------
     # ARA
     #---------------------------------------------------------------------------
-    print('\nARA')
-    print('-' * 80)
+    elif args.set == 'ara':
+        print('\nARA')
+        print('-' * 80)
 
-    # MCMC
-    print('MCMC')
-    with timer():
-        d_opt, p_d = mcmc_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
-                              p.prob, p.a_prob_f, n=args.mcmc, m=args.ara)
+        if args.alg == 'mcmc':
+            print('MCMC')
+            with timer():
+                d_opt, p_d = mcmc_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
+                                      p.prob, p.a_prob_f, n=args.mcmc, m=args.ara)
+        elif args.alg == 'aps':
+            print('APS')
+            with timer():
+                d_opt, p_d = aps_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
+                                     p.prob, p.a_prob_f, N_aps=args.aps, J=args.ara,
+                                     burnin=args.burnin, N_inner=args.aps_inner)
+        else:
+            print('Error')
 
-    df1 = pd.DataFrame(p_d, index=pd.Index(p.d_values, name='d'),
-                            columns=pd.Index(p.a_values, name='a'))
-    df1.to_pickle('{}_mcmc_pa.pkl'.format(args.module))
+        df1 = pd.DataFrame(p_d, index=pd.Index(p.d_values, name='d'),
+                                columns=pd.Index(p.a_values, name='a'))
+        df1.to_pickle('{}_{}_pa.pkl'.format(args.module, args.alg))
 
-    print(d_opt)
-    with pd.option_context('display.max_columns', len(p.a_values)):
-        print(df1)
-
-    # APS
-    print('APS')
-    with timer():
-        d_opt, p_d = aps_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
-                             p.prob, p.a_prob_f, N_aps=args.aps, J=args.ara,
-                             burnin=args.burnin, N_inner=args.aps_inner)
-
-    df2 = pd.DataFrame(p_d, index=pd.Index(p.d_values, name='d'),
-                            columns=pd.Index(p.a_values, name='a'))
-    df2.to_pickle('{}_aps_pa.pkl'.format(args.module))
-
-    print(d_opt)
-    with pd.option_context('display.max_columns', len(p.a_values)):
-        print(df2)
+        print(d_opt)
+        with pd.option_context('display.max_columns', len(p.a_values)):
+            print(df1)
+    else:
+        print('Error')
