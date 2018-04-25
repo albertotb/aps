@@ -5,6 +5,20 @@ from scipy.stats import mode
 
 
 ########### APS auxiliar function #################################
+### Proposal of new d
+def propose(x_given, x_values):
+    if x_given == x_values[0]:
+        return( np.random.choice([x_values[1], x_values[-1]],
+        p=[0.5, 0.5]) )
+
+    if x_given == x_values[-1]:
+        return( np.random.choice([x_values[0], x_values[-2]],
+        p=[0.5, 0.5]) )
+
+    idx = list(x_values).index(x_given)
+    return( np.random.choice([x_values[idx+1], x_values[idx-1]],
+    p=[0.5, 0.5]) )
+
 def innerAPS(d_given, a_values, a_util, theta, N_inner=1000, burnin=0.75):
     """ Computes the attacker's solution in an attacker-defender game using APS
 
@@ -34,9 +48,6 @@ def innerAPS(d_given, a_values, a_util, theta, N_inner=1000, burnin=0.75):
     a_sim = np.zeros(N_inner, dtype = int)
     a_sim[0] = np.random.choice(a_values)
     theta_sim = theta(d_given, a_sim[0])
-
-    def propose(a_given, a_values):
-        return np.random.choice(a_values[~(a_values == a_given)])
 
     for i in range(1,N_inner):
         ## Update a
@@ -91,20 +102,6 @@ def aps_atk_def(d_values, a_values, d_util, a_util, theta, N_aps=1000,
             Percentage of burn-in iterations in the APS and APS inner algorithms
     """
 
-    ################################################################################
-    ### Proposal of new d
-    def propose(d_given):
-        if d_given == d_values[0]:
-            return( np.random.choice([d_values[1], d_values[-1]],
-            p=[0.5, 0.5]) )
-
-        if d_given == d_values[-1]:
-            return( np.random.choice([d_values[0], d_values[-2]],
-            p=[0.5, 0.5]) )
-
-        idx = list(d_values).index(d_given)
-        return( np.random.choice([d_values[idx+1], d_values[idx-1]],p=[0.5, 0.5]) )
-
     ## Compute a* for all d
     if verbose:
         print("PREPROCESSING...")
@@ -125,7 +122,7 @@ def aps_atk_def(d_values, a_values, d_util, a_util, theta, N_aps=1000,
 
     for i in range(1,N_aps):
         ## Update d
-        d_tilde = propose(d_sim[i-1])
+        d_tilde = propose(d_sim[i-1], d_values)
         a_tilde = a_star[d_values == d_tilde][0]
         theta_tilde = theta(d_tilde, a_tilde)
 
@@ -199,20 +196,6 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
             Number of inner iterations to compute the random optimal
             attacks distribution
     """
-    ################################################################################
-    ### Proposal of new d
-    def propose(d_given):
-        if d_given == d_values[0]:
-            return( np.random.choice([d_values[1], d_values[-1]],
-            p=[0.5, 0.5]) )
-
-        if d_given == d_values[-1]:
-            return( np.random.choice([d_values[0], d_values[-2]],
-            p=[0.5, 0.5]) )
-
-        idx = list(d_values).index(d_given)
-        return( np.random.choice([d_values[idx + 1], d_values[idx - 1] ],p=[0.5, 0.5]) )
-
     ## Compute a* for all d
     if verbose:
         print("PREPROCESSING...")
@@ -235,7 +218,7 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
 
     for i in range(1,N_aps):
         ## Update d
-        d_tilde = propose(d_sim[i-1])
+        d_tilde = propose(d_sim[i-1], d_values)
         a_tilde = np.random.choice(a_values, p=p_d[d_values == d_tilde, :][0])
         theta_tilde = theta_d(d_tilde, a_tilde)
 
