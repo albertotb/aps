@@ -37,17 +37,17 @@ def mcmc_atk_def(d_values, a_values, d_util, a_util, prob, n=1000):
     """
     a_opt = np.zeros_like(d_values)
     psi_d = np.zeros_like(d_values, dtype=float)
+    psi_a = np.zeros((len(d_values), len(a_values)), dtype=float)
     for i, d in enumerate(d_values):
-        psi_a = np.zeros_like(a_values, dtype=float)
         for j, a in enumerate(a_values):
             theta_a = prob(d, a, size=n)
-            psi_a[j] = a_util(a, theta_a).mean()
+            psi_a[i, j] = a_util(a, theta_a).mean()
         a_opt[i] = a_values[psi_a.argmax()]
         theta_d = prob(d, a_opt[i], size=n)
         psi_d[i] = d_util(d, theta_d).mean()
 
     d_opt = d_values[psi_d.argmax()]
-    return d_opt, a_opt, psi_a, psi_d
+    return d_opt, a_opt, psi_d, psi_a
 
 
 def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f, n=1000, m=1000):
@@ -115,4 +115,4 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f, n=1000, m=1
             psi_d[i, j] = (d_util(d, theta_d)*p_d[i, j]).mean()
 
     d_opt = d_values[psi_d.sum(axis=1).argmax()]
-    return d_opt, p_d, psi_a, psi_d
+    return d_opt, p_d, psi_d
