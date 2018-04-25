@@ -90,19 +90,24 @@ if __name__ == '__main__':
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
-                d_opt, a_opt = mcmc_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
+                d_opt, a_opt, psi_d, psi_a = mcmc_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
                                             p.prob, n=args.mcmc)
         elif args.alg == 'aps':
             print('APS')
             with timer():
-                d_opt, a_opt = aps_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
+                d_opt, a_opt, psi_d, psi_a = aps_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
                                            p.prob, N_aps=args.aps, burnin=args.burnin,
                                            N_inner=args.aps_inner)
         else:
             print('Error')
 
+        np.save('{}_{}_psi_d.npy'.format(args.module, args.alg), psi_d)
+        np.save('{}_{}_psi_a.npy'.format(args.module, args.alg), psi_a)
+
         print(d_opt)
         print(a_opt)
+        print(psi_d)
+        print(psi_a)
 
     #---------------------------------------------------------------------------
     # ARA
@@ -114,16 +119,21 @@ if __name__ == '__main__':
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
-                d_opt, p_d = mcmc_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
+                d_opt, p_d, psi_d, psi_a = mcmc_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
                                       p.prob, p.a_prob_f, n=args.mcmc, m=args.ara)
+
+                np.save('{}_{}_psi_a.npy'.format(args.module, args.alg), psi_a)
+
         elif args.alg == 'aps':
             print('APS')
             with timer():
-                d_opt, p_d = aps_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
+                d_opt, p_d, psi_d = aps_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
                                      p.prob, p.a_prob_f, N_aps=args.aps, J=args.ara,
                                      burnin=args.burnin, N_inner=args.aps_inner)
         else:
             print('Error')
+
+        np.save('{}_{}_psi_d.npy'.format(args.module, args.alg), psi_d)
 
         df1 = pd.DataFrame(p_d, index=pd.Index(p.d_values, name='d'),
                                 columns=pd.Index(p.a_values, name='a'))

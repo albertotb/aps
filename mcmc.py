@@ -47,7 +47,7 @@ def mcmc_atk_def(d_values, a_values, d_util, a_util, prob, n=1000):
         psi_d[i] = d_util(d, theta_d).mean()
 
     d_opt = d_values[psi_d.argmax()]
-    return d_opt, a_opt
+    return d_opt, a_opt, psi_a, psi_d
 
 
 def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f, n=1000, m=1000):
@@ -115,4 +115,4 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f, n=1000, m=1
             psi_d[i, j] = (d_util(d, theta_d)*p_d[i, j]).mean()
 
     d_opt = d_values[psi_d.sum(axis=1).argmax()]
-    return d_opt, p_d
+    return d_opt, p_d, psi_a, psi_d

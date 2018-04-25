@@ -52,7 +52,8 @@ def innerAPS(d_given, a_values, a_util, theta, N_inner=1000, burnin=0.75):
         else:
             a_sim[i] = a_sim[i-1]
 
-    return(mode(a_sim[int(burnin*N_inner):])[0][0])
+    a_dist = a_sim[int(burnin*N_inner):]
+    return(mode(a_dist)[0][0], a_dist)
 
 
 def aps_atk_def(d_values, a_values, d_util, a_util, theta, N_aps=1000,
@@ -108,8 +109,9 @@ def aps_atk_def(d_values, a_values, d_util, a_util, theta, N_aps=1000,
     if verbose:
         print("PREPROCESSING...")
     a_star = np.zeros_like(d_values)
+    a_dist = {}
     for i, d in enumerate(d_values):
-        a_star[i] = innerAPS(d, a_values, a_util, theta, N_inner, burnin)
+        a_star[i], a_dist[d] = innerAPS(d, a_values, a_util, theta, N_inner, burnin)
 
 
     ## Start d_sim, vector of length N_aps to save in it simulation results
@@ -143,7 +145,8 @@ def aps_atk_def(d_values, a_values, d_util, a_util, theta, N_aps=1000,
             if i%1000 == 0:
                 print(i)
 
-    return(mode(d_sim[int(burnin*N_aps):])[0], a_star)
+    d_dist = d_sim[int(burnin*N_aps):]
+    return(mode(d_dist)[0], a_star, a_dist, d_dist)
 
 
 def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
@@ -218,8 +221,8 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
     for i, d_given in enumerate(d_values):
         modes = np.zeros(J, dtype=int)
         for jj in range(J):
-            modes[jj] = innerAPS( d_given, a_values, a_util_f(),
-            a_prob_f(d_given), N_inner, burnin )
+            modes[jj], _ = innerAPS(d_given, a_values, a_util_f(),
+                                 a_prob_f(d_given), N_inner, burnin )
         p_d[i, :] = np.bincount(modes, minlength = len(a_values))/J
 
     d_sim = np.zeros(N_aps, dtype = int)
@@ -252,4 +255,5 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
             if i%1000 == 0:
                 print(i)
 
-    return(mode(d_sim[int(burnin*N_aps):])[0], p_d)
+    d_dist = d_sim[int(burnin*N_aps):]
+    return(mode(d_dist)[0], p_d, d_dist)
