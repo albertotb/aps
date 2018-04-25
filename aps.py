@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import bernoulli
 from scipy.stats import mode
 
-
+#
 ########### APS auxiliar function #################################
 ### Proposal of new d
 def propose(x_given, x_values):
