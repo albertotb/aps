@@ -42,7 +42,7 @@ def mcmc_atk_def(d_values, a_values, d_util, a_util, prob, n=1000):
         for j, a in enumerate(a_values):
             theta_a = prob(d, a, size=n)
             psi_a[i, j] = a_util(a, theta_a).mean()
-        a_opt[i] = a_values[psi_a.argmax()]
+        a_opt[i] = a_values[psi_a[i, :].argmax()]
         theta_d = prob(d, a_opt[i], size=n)
         psi_d[i] = d_util(d, theta_d).mean()
 

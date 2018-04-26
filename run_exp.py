@@ -136,7 +136,7 @@ if __name__ == '__main__':
         else:
             print('Error')
 
-        np.save('{}/{}_{}_psi_d.npy'.format(args.output, args.module, args.alg), psi_d)
+        np.save('{}/{}_{}_pd.npy'.format(args.output, args.module, args.alg), psi_d)
 
         df1 = pd.DataFrame(p_d, index=pd.Index(p.d_values, name='d'),
                                 columns=pd.Index(p.a_values, name='a'))

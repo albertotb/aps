@@ -54,9 +54,8 @@ def a_prob_f():
 
 if __name__ == '__main__':
 
-    # check all utils all positive
-    gmin, gmax = gamma.ppf([0.01, 0.99], a=4, scale=1)
-    l_values = np.linspace(gmin, gmax, 1000)
+    # check all utils are positive
+    l_values = np.linspace(0, gamma.ppf(0.99, a=4, scale=1), 1000)
 
     for n in range(1000):
         assert (np.array([ (a_util(a, l_values) > 0).all() for a in a_values ]) > 0).all()

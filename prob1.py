@@ -30,7 +30,7 @@ cd = (data['c_D'].groupby(['d', 'theta'])
 p1 = (data.loc[pd.IndexSlice[:, :, 1], 'p']
           .values.reshape(len(d_values), len(a_values)))
 
-E = 10
+E = 1
 C = 0.4
 UD_MAX = np.exp(cd.max()*C)
 
