@@ -51,3 +51,13 @@ def a_prob_f():
     scale_g = unif(0.8, 1.2)
     scale_l = unif(0.8, 1.2)
     return lambda d, a, size=1: pl(d, a, a_g, scale_g, a_l, scale_l, size=size)
+
+if __name__ == '__main__':
+
+    # check all utils all positive
+    gmin, gmax = gamma.ppf([0.01, 0.99], a=4, scale=1)
+    l_values = np.linspace(gmin, gmax, 1000)
+
+    for n in range(1000):
+        assert (np.array([ (a_util(a, l_values) > 0).all() for a in a_values ]) > 0).all()
+        assert (np.array([ (d_util(d, l_values) > 0).all() for d in d_values ]) > 0).all()
