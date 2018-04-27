@@ -204,7 +204,7 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
     for i, d_given in enumerate(d_values):
         def wrapper(d_given, a_values, N_inner, burnin):
             a_util = a_util_f()
-            a_prob = a_prob_f(d_given)
+            a_prob = a_prob_f(d=d_given)
             return innerAPS(d_given, a_values, a_util, a_prob, N_inner, burnin)
 
         with Parallel(n_jobs=8) as parallel:
