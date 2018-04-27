@@ -46,7 +46,7 @@ def a_util_f():
     e=uniform.rvs(scale=2)
     return lambda a, theta: ua(ca[a, theta], e = e)
 
-def a_prob_f(d):
+def a_prob_f(d=None):
     p1 = beta.rvs(a=alpha_values[d], b=beta_values[d])
     def a_prob(d, a, size=1):
         return bernoulli.rvs(p=p1,

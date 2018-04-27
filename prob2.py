@@ -45,7 +45,7 @@ def a_util_f():
     ka       = unif(8, 10)
     return lambda a, theta: ua(ca(a, theta, p, a_param, b_param), ka=ka)
 
-def a_prob_f():
+def a_prob_f(d=None):
     a_g     = unif(4.8, 5.6)
     a_l     = unif(3.6, 4.8)
     scale_g = unif(0.8, 1.2)

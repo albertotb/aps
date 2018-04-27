@@ -49,6 +49,12 @@ if __name__ == '__main__':
                 help='output dir',
                 default='.')
 
+    parser.add_argument('--n_jobs',
+                type=int,
+                dest='njobs',
+                help='Number of jobs',
+                default=1)
+
     parser.add_argument('--mcmc',
                 type=int,
                 dest='mcmc',
@@ -100,8 +106,10 @@ if __name__ == '__main__':
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
-                d_opt, a_opt, psi_d, psi_a = mcmc_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
-                                            p.prob, n=args.mcmc)
+                d_opt, a_opt, psi_d, psi_a = mcmc_atk_def(p.d_values, p.a_values,
+                                                          p.d_util, p.a_util,
+                                                          p.prob,
+                                                          mcmc_iters=args.mcmc)
         elif args.alg == 'aps':
             print('APS')
             with timer():
@@ -135,8 +143,11 @@ if __name__ == '__main__':
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
-                d_opt, p_d, psi_d = mcmc_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
-                                      p.prob, p.a_prob_f, n=args.mcmc, m=args.ara, p_d=p_d.values)
+                d_opt, p_d, psi_d = mcmc_ara(p.d_values, p.a_values, p.d_util,
+                                             p.a_util_f, p.prob, p.a_prob_f,
+                                             mcmc_iters=args.mcmc,
+                                             ara_iters=args.ara, p_d=p_d.values,
+                                             n_jobs=args.njobs)
 
         elif args.alg == 'aps':
             print('APS')
