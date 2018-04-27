@@ -43,16 +43,18 @@ d_util = lambda d, theta: ud(cd[d, theta], c=C) + UD_MAX
 a_util = lambda a, theta: ua(ca[a, theta], e=E)
 
 def a_util_f():
-    return lambda a, theta: ua(ca[a, theta], e=uniform.rvs(scale=20))
+    e=uniform.rvs(scale=2)
+    return lambda a, theta: ua(ca[a, theta], e = e)
 
-def a_prob_f():
+def a_prob_f(d):
+    p1 = beta.rvs(a=alpha_values[d], b=beta_values[d])
     def a_prob(d, a, size=1):
-        return bernoulli.rvs(p=beta.rvs(a=alpha_values[d], b=beta_values[d]),
+        return bernoulli.rvs(p=p1,
                              size=size) if a==1 else np.zeros(size, dtype=int)
     return a_prob
 
 if __name__ == '__main__':
-    
+
     # check all utilities are positive
     util_a = ua(data['c_A'], e=E)
     util_d = ud(data['c_D'], c=C) + np.exp(data['c_D'].max()*C)
@@ -61,10 +63,10 @@ if __name__ == '__main__':
     assert (util_d >= 0).all()
 
 
-    cadf = pd.DataFrame(ca, index=pd.Index(a_values, name='a'), 
+    cadf = pd.DataFrame(ca, index=pd.Index(a_values, name='a'),
                             columns=pd.Index(theta_values, name='theta'))
 
-    cddf = pd.DataFrame(cd, index=pd.Index(d_values, name='d'), 
+    cddf = pd.DataFrame(cd, index=pd.Index(d_values, name='d'),
                             columns=pd.Index(theta_values, name='theta'))
 
     p1df = pd.DataFrame(p1, index=pd.Index(d_values, name='d'),
