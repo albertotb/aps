@@ -135,7 +135,7 @@ if __name__ == '__main__':
         print('-' * 80)
 
         if args.prob:
-            p_d = pd.read_pickle('{}'.format(args.prob))
+            p_d = pd.read_pickle('{}'.format(args.prob)).values
             print(p_d)
         else:
             p_d = None
@@ -146,15 +146,17 @@ if __name__ == '__main__':
                 d_opt, p_d, psi_d = mcmc_ara(p.d_values, p.a_values, p.d_util,
                                              p.a_util_f, p.prob, p.a_prob_f,
                                              mcmc_iters=args.mcmc,
-                                             ara_iters=args.ara, p_d=p_d.values,
+                                             ara_iters=args.ara, 
                                              n_jobs=args.njobs)
 
         elif args.alg == 'aps':
             print('APS')
             with timer():
-                d_opt, p_d, psi_d = aps_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
-                                     p.prob, p.a_prob_f, N_aps=args.aps, J=args.ara,
-                                     burnin=args.burnin, N_inner=args.aps_inner, p_d=p_d.values)
+                d_opt, p_d, psi_d = aps_ara(p.d_values, p.a_values, p.d_util, 
+                                            p.a_util_f, p.prob, p.a_prob_f, 
+                                            N_aps=args.aps, J=args.ara, 
+                                            burnin=args.burnin, p_d=p_d,
+                                            N_inner=args.aps_inner)
         else:
             print('Error')
 
