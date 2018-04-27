@@ -61,6 +61,11 @@ if __name__ == '__main__':
                 help='Number of ARA iterations',
                 default=1000)
 
+    parser.add_argument('--prob',
+                dest='prob',
+                help='Probability density p(a | d)',
+                default=None)
+
     parser.add_argument('--aps',
                 type=int,
                 dest='aps',
@@ -121,18 +126,24 @@ if __name__ == '__main__':
         print('\nARA')
         print('-' * 80)
 
+        if args.prob:
+            p_d = pd.read_pickle('{}'.format(args.prob))
+            print(p_d)
+        else:
+            p_d = None
+
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
                 d_opt, p_d, psi_d = mcmc_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
-                                      p.prob, p.a_prob_f, n=args.mcmc, m=args.ara)
+                                      p.prob, p.a_prob_f, n=args.mcmc, m=args.ara, p_d=p_d.values)
 
         elif args.alg == 'aps':
             print('APS')
             with timer():
                 d_opt, p_d, psi_d = aps_ara(p.d_values, p.a_values, p.d_util, p.a_util_f,
                                      p.prob, p.a_prob_f, N_aps=args.aps, J=args.ara,
-                                     burnin=args.burnin, N_inner=args.aps_inner)
+                                     burnin=args.burnin, N_inner=args.aps_inner, p_d=p_d.values)
         else:
             print('Error')
 

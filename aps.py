@@ -147,7 +147,7 @@ def aps_atk_def(d_values, a_values, d_util, a_util, theta, N_aps=1000,
 
 
 def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
-            N_aps=1000, burnin=0.75, N_inner = 1000, J = 100, verbose=False):
+            N_aps=1000, burnin=0.75, N_inner = 1000, J = 100, p_d = None, verbose=False):
     """ Computes the solution of ARA using MCMC
 
         Parameters
@@ -197,21 +197,22 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
             attacks distribution
     """
     ## Compute a* for all d
-    if verbose:
-        print("PREPROCESSING...")
-    p_d = np.zeros((len(d_values), len(a_values)), dtype=float)
+    if not p_d.shape:
+        if verbose:
+            print("PREPROCESSING...")
+        p_d = np.zeros((len(d_values), len(a_values)), dtype=float)
 
-    for i, d_given in enumerate(d_values):
-        def wrapper(d_given, a_values, N_inner, burnin):
-            a_util = a_util_f()
-            a_prob = a_prob_f(d_given)
-            return innerAPS(d_given, a_values, a_util, a_prob, N_inner, burnin)
+        for i, d_given in enumerate(d_values):
+            def wrapper(d_given, a_values, N_inner, burnin):
+                a_util = a_util_f()
+                a_prob = a_prob_f(d_given)
+                return innerAPS(d_given, a_values, a_util, a_prob, N_inner, burnin)
 
-        with Parallel(n_jobs=8) as parallel:
-            results = parallel(delayed(wrapper)(d_given, a_values, N_inner, burnin) for jj in range(J))
+            with Parallel(n_jobs=8) as parallel:
+                results = parallel(delayed(wrapper)(d_given, a_values, N_inner, burnin) for jj in range(J))
 
-        modes = np.fromiter(map(lambda t: t[0], results), dtype=int)
-        p_d[i, :] = np.bincount(modes, minlength = len(a_values))/J
+            modes = np.fromiter(map(lambda t: t[0], results), dtype=int)
+            p_d[i, :] = np.bincount(modes, minlength = len(a_values))/J
 
     d_sim = np.zeros(N_aps, dtype = int)
     d_sim[0] = np.random.choice(d_values)
