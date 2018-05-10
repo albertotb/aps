@@ -3,8 +3,6 @@ import numpy as np
 from scipy.integrate import quad
 from joblib import Parallel, delayed
 
-def scale(x):
-    return (x - x.min())/(x.max() - x.min())
 
 def mcmc_atk_def(d_values, a_values, d_util, a_util, d_prob, a_prob,
                  mcmc_iters=1000):

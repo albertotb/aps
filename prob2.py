@@ -4,8 +4,20 @@ import numpy as np
 import pandas as pd
 from scipy.stats import uniform, gamma, beta, binom, norm
 
-CA_MAX = 1.5e6
-CA_MIN = -4.33e6
+CA_MAX = 0
+CA_MIN = -4.5e6 -792*30
+
+CD_MIN = 0
+CD_MAX = 1.5e6 + 12000
+
+def scale(x, max=None, min=None):
+    if not max:
+        max = x.max()
+
+    if not min:
+        min = x.min()
+
+    return (x - min)/(max - min)
 
 unif = lambda a, b, size=1: uniform.rvs(a, b-a, size=size)
 
@@ -29,10 +41,10 @@ def ct(a, p):
     return norm.rvs(2430000, 400000) * t
 
 cd = lambda d, l, alpha, beta: cs(d) + pm(l, alpha=alpha, beta=beta)
-ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/7e6) - 1)
+ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/CD_MAX) - 1)
 
 ca = lambda a, l, p, alpha, beta: pm(l, alpha=alpha, beta=beta)-ct(a, p=p)-792*a
-ua = lambda ca, ka=1: ((ca - CA_MIN)/(CA_MAX - CA_MIN)) ** ka
+ua = lambda ca, ka=1: (ca - CA_MIN)/(CA_MAX - CA_MIN) ** ka
 
 prob   = lambda d, a, size=1: pl(a, d, 5, 1, 4, 1, size=size)
 d_util = lambda d, theta: ud(cd(d, theta, 0.0026, 0.00417))
@@ -57,6 +69,18 @@ if __name__ == '__main__':
     # check all utils are positive
     l_values = np.linspace(0, gamma.ppf(0.99, a=4, scale=1), 1000)
 
-    for n in range(1000):
-        assert (np.array([ (a_util(a, l_values) > 0).all() for a in a_values ]) > 0).all()
-        assert (np.array([ (d_util(d, l_values) > 0).all() for d in d_values ]) > 0).all()
+    ca_min = ca(a_values.min(), np.repeat(l_values[0], 1000000), 0.002, 0.0026, 0.00417)
+    ca_max = ca(a_values.max(), np.repeat(l_values[-1], 1000000), 0.002, 0.0026, 0.00417)
+
+    print(ca_min.min())
+    print(ca_max.max())
+
+    ca_min = ca(a_values.min(), prob(a_values.min(), d_values.max(), size=100000), 0.002, 0.0026, 0.00417)
+    ca_max = ca(a_values.max(), prob(a_values.max(), d_values.min(), size=100000), 0.002, 0.0026, 0.00417)
+
+    print(ca_min.min())
+    print(ca_max.max())
+    
+    #for n in range(1000):
+    #    assert (np.array([ (a_util(a, l_values) > 0).all() for a in a_values ]) > 0).all()
+    #    assert (np.array([ (d_util(d, l_values) > 0).all() for d in d_values ]) > 0).all()

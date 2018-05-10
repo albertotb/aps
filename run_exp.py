@@ -113,9 +113,11 @@ if __name__ == '__main__':
         elif args.alg == 'aps':
             print('APS')
             with timer():
-                d_opt, a_opt, psi_d, psi_a = aps_atk_def(p.d_values, p.a_values, p.d_util, p.a_util,
-                                           p.prob, N_aps=args.aps, burnin=args.burnin,
-                                           N_inner=args.aps_inner)
+                d_opt, a_opt, psi_d, psi_a = aps_atk_def(p.d_values, p.a_values,
+                                                         p.d_util, p.a_util,
+                                                         p.prob, N_aps=args.aps,
+                                                         burnin=args.burnin,
+                                                         N_inner=args.aps_inner)
         else:
             print('Error')
 
@@ -125,7 +127,8 @@ if __name__ == '__main__':
         print(d_opt)
         print(a_opt)
         print(psi_d)
-        print(psi_a)
+        with pd.option_context('display.max_columns', len(p.a_values)):
+            print(pd.DataFrame(psi_a, index=p.d_values, columns=p.a_values))
 
     #---------------------------------------------------------------------------
     # ARA
