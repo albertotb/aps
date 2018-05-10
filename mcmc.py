@@ -6,7 +6,8 @@ from joblib import Parallel, delayed
 def scale(x):
     return (x - x.min())/(x.max() - x.min())
 
-def mcmc_atk_def(d_values, a_values, d_util, a_util, prob, mcmc_iters=1000):
+def mcmc_atk_def(d_values, a_values, d_util, a_util, d_prob, a_prob,
+                 mcmc_iters=1000):
     """ Computes the solution of an attacker-defender game using MCMC
 
         Parameters
@@ -27,10 +28,16 @@ def mcmc_atk_def(d_values, a_values, d_util, a_util, prob, mcmc_iters=1000):
                 ``a_util(a, theta) -> array, shape (same as theta)``
 
             where theta is a 1-D array and a is the decision of the attacker
-        prob : callable
-            Draws samples of theta from the distribution p(theta | d, a)
+        d_prob : callable
+            Draws samples of theta from the distribution p_d(theta | d, a)
 
-                ``prob(d, a, size=1) -> array, shape (size,)``
+                ``d_prob(d, a, size=1) -> array, shape (size,)``
+
+            where d and a are the decisions for the defender and the attacker
+        a_prob : callable
+            Draws samples of theta from the distribution p_a(theta | d, a)
+
+                ``a_prob(d, a, size=1) -> array, shape (size,)``
 
             where d and a are the decisions for the defender and the attacker
         n : int, optional (default=1000)
@@ -41,10 +48,10 @@ def mcmc_atk_def(d_values, a_values, d_util, a_util, prob, mcmc_iters=1000):
     psi_a = np.zeros((len(d_values), len(a_values)), dtype=float)
     for i, d in enumerate(d_values):
         for j, a in enumerate(a_values):
-            theta_a = prob(d, a, size=mcmc_iters)
+            theta_a = a_prob(d, a, size=mcmc_iters)
             psi_a[i, j] = a_util(a, theta_a).mean()
         a_opt[i] = a_values[psi_a[i, :].argmax()]
-        theta_d = prob(d, a_opt[i], size=n)
+        theta_d = d_prob(d, a_opt[i], size=mcmc_iters)
         psi_d[i] = d_util(d, theta_d).mean()
 
     d_opt = d_values[psi_d.argmax()]
