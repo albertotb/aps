@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import pickle
 import argparse
 import numpy as np
 import pandas as pd
@@ -42,7 +43,7 @@ if __name__ == '__main__':
                 dest='set',
                 help='setting',
                 default='atk_def',
-                choices=['atk_def', 'ara'])
+                choices=['adg', 'ara'])
 
     parser.add_argument('-o',
                 dest='output',
@@ -102,21 +103,21 @@ if __name__ == '__main__':
     #---------------------------------------------------------------------------
     # Attacker-defender game
     #---------------------------------------------------------------------------
-    if args.set == 'atk_def':
+    if args.set == 'adg':
         print('Game theory')
         print('-' * 80)
 
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
-                d_opt, a_opt, psi_d, psi_a = mcmc_atk_def(p.d_values, p.a_values,
+                d_opt, a_opt, psi_d, psi_a = mcmc_adg(p.d_values, p.a_values,
                                                           p.d_util, p.a_util,
                                                           p.prob, p.prob,
                                                           mcmc_iters=args.mcmc)
         elif args.alg == 'aps':
             print('APS')
             with timer():
-                d_opt, a_opt, psi_d, psi_a = aps_atk_def(p.d_values, p.a_values,
+                d_opt, a_opt, psi_d, psi_a = aps_adg(p.d_values, p.a_values,
                                                          p.d_util, p.a_util,
                                                          p.prob, N_aps=args.aps,
                                                          burnin=args.burnin,
@@ -125,7 +126,7 @@ if __name__ == '__main__':
             print('Error')
 
         a_opt = pd.Series(a_opt, index=d_idx)
-        psi_d = pd.Series(psi_d, index=a_idx)
+        psi_d = pd.Series(psi_d, index=d_idx)
         psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
         dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a}
     #---------------------------------------------------------------------------
@@ -136,20 +137,20 @@ if __name__ == '__main__':
         print('-' * 80)
 
         if args.prob:
-            p_d = pd.read_pickle('{}'.format(args.prob)).values
-            print(p_d)
+            p_a = pd.read_pickle('{}'.format(args.prob)).values
+            print(p_a)
         else:
-            p_d = None
+            p_a = None
 
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
-                d_opt, p_a, psi_d, psi_a = mcmc_ara(p.d_values, p.a_values,
-                                                    p.d_util, p.a_util_f, p.prob,
-                                                    p.a_prob_f,
-                                                    mcmc_iters=args.mcmc,
-                                                    ara_iters=args.ara,
-                                                    n_jobs=args.njobs)
+                d_opt, p_a, psi_da, psi_ad = mcmc_ara(p.d_values, p.a_values,
+                                                      p.d_util, p.a_util_f, p.prob,
+                                                      p.a_prob_f,
+                                                      mcmc_iters=args.mcmc,
+                                                      ara_iters=args.ara,
+                                                      n_jobs=args.njobs)
 
         elif args.alg == 'aps':
             print('APS')
@@ -158,13 +159,13 @@ if __name__ == '__main__':
                                                    p.d_util, p.a_util_f, p.prob,
                                                    p.a_prob_f, N_aps=args.aps,
                                                    J=args.ara,
-                                                   burnin=args.burnin, p_d=p_d,
+                                                   burnin=args.burnin, p_d=p_a,
                                                    N_inner=args.aps_inner)
         else:
             print('Error')
 
-        a_opt = pd.Series(p_d.argmax(axis=1), index=d_idx)
-        psi_d = pd.Series(psi_da.sum(axis=1), index=a_idx)
+        a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
+        psi_d = pd.Series(psi_da.sum(axis=1), index=d_idx)
         psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
         p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
         dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a,

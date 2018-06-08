@@ -4,7 +4,7 @@ from scipy.integrate import quad
 from joblib import Parallel, delayed
 
 
-def mcmc_atk_def(d_values, a_values, d_util, a_util, d_prob, a_prob,
+def mcmc_adg(d_values, a_values, d_util, a_util, d_prob, a_prob,
                  mcmc_iters=1000):
     """ Computes the solution of an attacker-defender game using MCMC
 
