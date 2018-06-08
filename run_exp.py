@@ -9,8 +9,8 @@ from importlib import import_module
 from contextlib import contextmanager
 
 sys.path.append('.')
-from mcmc import mcmc_atk_def, mcmc_ara
-from aps import aps_atk_def, aps_ara
+from mcmc import mcmc_adg, mcmc_ara
+from aps import aps_adg, aps_ara
 
 @contextmanager
 def timer():
@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
     p = import_module(args.module)
 
-    np.random.seed(1234)
+    #np.random.seed(1234)
 
     d_idx = pd.Index(p.d_values, name='d')
     a_idx = pd.Index(p.a_values, name='a')
@@ -125,9 +125,9 @@ if __name__ == '__main__':
         else:
             print('Error')
 
-        a_opt = pd.Series(a_opt, index=d_idx)
-        psi_d = pd.Series(psi_d, index=d_idx)
-        psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
+        # a_opt = pd.Series(a_opt, index=d_idx)
+        # psi_d = pd.Series(psi_d, index=d_idx)
+        # psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
         dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a}
     #---------------------------------------------------------------------------
     # ARA
@@ -164,10 +164,10 @@ if __name__ == '__main__':
         else:
             print('Error')
 
-        a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
-        psi_d = pd.Series(psi_da.sum(axis=1), index=d_idx)
-        psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
-        p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
+        # a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
+        # psi_d = pd.Series(psi_da.sum(axis=1), index=d_idx)
+        # psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
+        # p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
         dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a,
                 'psi_da': psi_da, 'psi_ad': psi_ad, 'p_a': p_a}
         with pd.option_context('display.max_columns', len(p.a_values)):
@@ -181,6 +181,6 @@ if __name__ == '__main__':
     with pd.option_context('display.max_columns', len(p.a_values)):
         print(psi_a)
 
-    fout = '{}/{}_{}_{}.pkl'.format(args.output, args.module, args.set, args.alg)
+    fout = '{}/{}_{}_{}.pkl'.format(args.output, args.module, args.alg, args.set)
     with open(fout, "wb") as f:
         pickle.dump(dout, f)

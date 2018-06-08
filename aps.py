@@ -67,7 +67,7 @@ def innerAPS(d_given, a_values, a_util, theta, N_inner=1000, burnin=0.75):
     return(mode(a_dist)[0][0], a_dist)
 
 
-def aps_atk_def(d_values, a_values, d_util, a_util, theta, N_aps=1000,
+def aps_adg(d_values, a_values, d_util, a_util, theta, N_aps=1000,
                 burnin=0.75, N_inner = 4000, verbose=False):
 
     """ Computes the solution of an attacker-defender game using APS
