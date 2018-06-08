@@ -49,7 +49,7 @@ if __name__ == '__main__':
                 help='output dir',
                 default='.')
 
-    parser.add_argument('--n_jobs',
+    parser.add_argument('--njobs',
                 type=int,
                 dest='njobs',
                 help='Number of jobs',
@@ -96,6 +96,9 @@ if __name__ == '__main__':
 
     np.random.seed(1234)
 
+    d_idx = pd.Index(p.d_values, name='d')
+    a_idx = pd.Index(p.a_values, name='a')
+
     #---------------------------------------------------------------------------
     # Attacker-defender game
     #---------------------------------------------------------------------------
@@ -121,15 +124,10 @@ if __name__ == '__main__':
         else:
             print('Error')
 
-        np.save('{}/{}_{}_psi_d.npy'.format(args.output, args.module, args.alg), psi_d)
-        np.save('{}/{}_{}_psi_a.npy'.format(args.output, args.module, args.alg), psi_a)
-
-        print(d_opt)
-        print(a_opt)
-        print(psi_d)
-        with pd.option_context('display.max_columns', len(p.a_values)):
-            print(pd.DataFrame(psi_a, index=p.d_values, columns=p.a_values))
-
+        a_opt = pd.Series(a_opt, index=d_idx)
+        psi_d = pd.Series(psi_d, index=a_idx)
+        psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
+        dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a}
     #---------------------------------------------------------------------------
     # ARA
     #---------------------------------------------------------------------------
@@ -146,32 +144,42 @@ if __name__ == '__main__':
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
-                d_opt, p_d, psi_d = mcmc_ara(p.d_values, p.a_values, p.d_util,
-                                             p.a_util_f, p.prob, p.a_prob_f,
-                                             mcmc_iters=args.mcmc,
-                                             ara_iters=args.ara,
-                                             n_jobs=args.njobs)
+                d_opt, p_a, psi_d, psi_a = mcmc_ara(p.d_values, p.a_values,
+                                                    p.d_util, p.a_util_f, p.prob,
+                                                    p.a_prob_f,
+                                                    mcmc_iters=args.mcmc,
+                                                    ara_iters=args.ara,
+                                                    n_jobs=args.njobs)
 
         elif args.alg == 'aps':
             print('APS')
             with timer():
-                d_opt, p_d, psi_d = aps_ara(p.d_values, p.a_values, p.d_util,
-                                            p.a_util_f, p.prob, p.a_prob_f,
-                                            N_aps=args.aps, J=args.ara,
-                                            burnin=args.burnin, p_d=p_d,
-                                            N_inner=args.aps_inner)
+                d_opt, p_a, psi_da, psi_ad = aps_ara(p.d_values, p.a_values,
+                                                   p.d_util, p.a_util_f, p.prob,
+                                                   p.a_prob_f, N_aps=args.aps,
+                                                   J=args.ara,
+                                                   burnin=args.burnin, p_d=p_d,
+                                                   N_inner=args.aps_inner)
         else:
             print('Error')
 
-        np.save('{}/{}_{}_pd.npy'.format(args.output, args.module, args.alg), psi_d)
-
-        df1 = pd.DataFrame(p_d, index=pd.Index(p.d_values, name='d'),
-                                columns=pd.Index(p.a_values, name='a'))
-        df1.to_pickle('{}/{}_{}_pa.pkl'.format(args.output, args.module, args.alg))
-
-        print(d_opt)
+        a_opt = pd.Series(p_d.argmax(axis=1), index=d_idx)
+        psi_d = pd.Series(psi_da.sum(axis=1), index=a_idx)
+        psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
+        p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
+        dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a,
+                'psi_da': psi_da, 'psi_ad': psi_ad, 'p_a': p_a}
         with pd.option_context('display.max_columns', len(p.a_values)):
-            print(df1)
-        print(psi_d)
+            print(p_a)
     else:
         print('Error')
+
+    print(d_opt)
+    print(a_opt)
+    print(psi_d)
+    with pd.option_context('display.max_columns', len(p.a_values)):
+        print(psi_a)
+
+    fout = '{}/{}_{}_{}.pkl'.format(args.output, args.module, args.set, args.alg)
+    with open(fout, "wb") as f:
+        pickle.dump(dout, f)

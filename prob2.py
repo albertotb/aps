@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import math
+import warnings
 import numpy as np
 import pandas as pd
 from scipy.stats import uniform, gamma, beta, binom, norm
 
+CA_MIN = -4.5e6-792*30
 CA_MAX = 1.5e6
-CA_MIN = -4.5e6-792*30+1.5e6
 
 CD_MIN = 0
 CD_MAX = 1.5e6 + 12000
@@ -41,10 +42,16 @@ def ct(a, p):
     return norm.rvs(2430000, 400000) * t
 
 cd = lambda d, l, alpha, beta: cs(d) + pm(l, alpha=alpha, beta=beta)
-ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/CD_MAX) - 1)
+ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/CD_MAX - 1))
 
 ca = lambda a, l, p, alpha, beta: pm(l, alpha=alpha, beta=beta)-ct(a, p=p)-792*a
-ua = lambda ca, ka=1: ((ca - CA_MIN)/(CA_MAX - CA_MIN)) ** ka
+def ua(ca, ka=1):
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        u = ((ca - CA_MIN)/(CA_MAX - CA_MIN)) ** ka
+        if len(w):
+            print(ca, ka, u)
+    return u
 
 prob   = lambda d, a, size=1: pl(a, d, 5, 1, 4, 1, size=size)
 d_util = lambda d, theta: ud(cd(d, theta, 0.0026, 0.00417))

@@ -105,9 +105,9 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
     """
     psi_d = np.zeros((len(d_values), len(a_values)), dtype=float)
     p_a = np.zeros((len(d_values), len(a_values)), dtype=float)
+    psi_a = np.zeros((len(d_values), len(a_values), ara_iters), dtype=float)
 
     for i, d in enumerate(d_values):
-        psi_a = np.zeros((len(a_values), ara_iters), dtype=float)
         for j, a in enumerate(a_values):
             def wrapper():
                 a_util = a_util_f()
@@ -118,8 +118,9 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
             with Parallel(n_jobs=n_jobs) as parallel:
                 results = parallel(delayed(wrapper)() for k in range(ara_iters))
 
-        psi_a[j, :] = np.array(results)
-        p_a[i, :] = (np.bincount(psi_a.argmax(axis=0), minlength=len(a_values))
+            psi_a[i, j, :] = np.array(results)
+
+        p_a[i, :] = (np.bincount(psi_a[i, :, :].argmax(axis=0), minlength=len(a_values))
                      / ara_iters)
 
         for j, a in enumerate(a_values):
@@ -127,4 +128,4 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
             psi_d[i, j] = (d_util(d, theta_d)*p_a[i, j]).mean()
 
     d_opt = d_values[psi_d.sum(axis=1).argmax()]
-    return d_opt, p_a, psi_d
+    return d_opt, p_a, psi_d, psi_a
