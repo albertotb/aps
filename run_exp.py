@@ -31,7 +31,7 @@ if __name__ == '__main__':
                 dest='module',
                 help='module with problem specific information',
                 default='prob1',
-                choices=['prob1', 'prob2', 'prob1_v2'])
+                choices=['prob1', 'prob2', 'prob3'])
 
     parser.add_argument('-a',
                 dest='alg',
@@ -42,11 +42,11 @@ if __name__ == '__main__':
     parser.add_argument('-s',
                 dest='set',
                 help='setting',
-                default='atk_def',
+                default='adg',
                 choices=['adg', 'ara'])
 
     parser.add_argument('-o',
-                dest='output',
+                dest='out',
                 help='output dir',
                 default='.')
 
@@ -100,6 +100,8 @@ if __name__ == '__main__':
     d_idx = pd.Index(p.d_values, name='d')
     a_idx = pd.Index(p.a_values, name='a')
 
+    print(args)
+
     #---------------------------------------------------------------------------
     # Attacker-defender game
     #---------------------------------------------------------------------------
@@ -110,18 +112,20 @@ if __name__ == '__main__':
         if args.alg == 'mcmc':
             print('MCMC')
             with timer():
-                d_opt, a_opt, psi_d, psi_a = mcmc_adg(p.d_values, p.a_values,
-                                                          p.d_util, p.a_util,
-                                                          p.prob, p.prob,
-                                                          mcmc_iters=args.mcmc)
+                d_opt, a_opt, psi_d, psi_a, t = mcmc_adg(p.d_values, p.a_values,
+                                                         p.d_util, p.a_util,
+                                                         p.prob, p.prob,
+                                                         mcmc_iters=args.mcmc)
+                print(t)
+                
         elif args.alg == 'aps':
             print('APS')
             with timer():
                 d_opt, a_opt, psi_d, psi_a = aps_adg(p.d_values, p.a_values,
-                                                         p.d_util, p.a_util,
-                                                         p.prob, N_aps=args.aps,
-                                                         burnin=args.burnin,
-                                                         N_inner=args.aps_inner)
+                                                     p.d_util, p.a_util,
+                                                     p.prob, N_aps=args.aps,
+                                                     burnin=args.burnin,
+                                                     N_inner=args.aps_inner)
         else:
             print('Error')
 
@@ -172,8 +176,10 @@ if __name__ == '__main__':
                 'psi_da': psi_da, 'psi_ad': psi_ad, 'p_a': p_a}
         with pd.option_context('display.max_columns', len(p.a_values)):
             print(p_a)
+
     else:
         print('Error')
+        sys.exit(1)
 
     print(d_opt)
     print(a_opt)
@@ -181,6 +187,6 @@ if __name__ == '__main__':
     with pd.option_context('display.max_columns', len(p.a_values)):
         print(psi_a)
 
-    fout = '{}/{}_{}_{}.pkl'.format(args.output, args.module, args.alg, args.set)
+    fout = '{}/{}_{}_{}.pkl'.format(args.out, args.module, args.alg, args.set)
     with open(fout, "wb") as f:
         pickle.dump(dout, f)
