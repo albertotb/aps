@@ -42,7 +42,7 @@ def ct(a, p):
     return norm.rvs(2430000, 400000) * t
 
 cd = lambda d, l, alpha, beta: cs(d) + pm(l, alpha=alpha, beta=beta)
-ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/CD_MAX - 1))
+ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/CD_MAX) - 1)
 
 ca = lambda a, l, p, alpha, beta: pm(l, alpha=alpha, beta=beta)-ct(a, p=p)-792*a
 def ua(ca, ka=1):
@@ -74,19 +74,27 @@ def a_prob_f(d=None):
 if __name__ == '__main__':
 
     # check all utils are positive
-    l_values = np.linspace(0, gamma.ppf(0.99, a=4, scale=1), 1000)
+    res = np.zeros((len(a_values), len(d_values)))
+    for i, a in enumerate(a_values):
+        for j, d in enumerate(d_values):
+            res[i, j] = prob(d, a, size=10000).mean()
 
-    ca_min = ca(a_values.min(), np.repeat(l_values[0], 1000000), 0.002, 0.0026, 0.00417)
-    ca_max = ca(a_values.max(), np.repeat(l_values[-1], 1000000), 0.002, 0.0026, 0.00417)
+    print(pd.DataFrame(res, index=a_values, columns=d_values))
 
-    print(ca_min.min())
-    print(ca_max.max())
 
-    ca_min = ca(a_values.min(), prob(a_values.min(), d_values.max(), size=100000), 0.002, 0.0026, 0.00417)
-    ca_max = ca(a_values.max(), prob(a_values.max(), d_values.min(), size=100000), 0.002, 0.0026, 0.00417)
-
-    print(ca_min.min())
-    print(ca_max.max())
+    # l_values = np.linspace(0, gamma.ppf(0.99, a=4, scale=1), 1000)
+    #
+    # ca_min = ca(a_values.min(), np.repeat(l_values[0], 1000000), 0.002, 0.0026, 0.00417)
+    # ca_max = ca(a_values.max(), np.repeat(l_values[-1], 1000000), 0.002, 0.0026, 0.00417)
+    #
+    # print(ca_min.min())
+    # print(ca_max.max())
+    #
+    # ca_min = ca(a_values.min(), prob(a_values.min(), d_values.max(), size=100000), 0.002, 0.0026, 0.00417)
+    # ca_max = ca(a_values.max(), prob(a_values.max(), d_values.min(), size=100000), 0.002, 0.0026, 0.00417)
+    #
+    # print(ca_min.min())
+    # print(ca_max.max())
 
     #for n in range(1000):
     #    assert (np.array([ (a_util(a, l_values) > 0).all() for a in a_values ]) > 0).all()
