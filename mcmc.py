@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from timeit import default_timer
 import numpy as np
-from scipy.integrate import quad
 from joblib import Parallel, delayed
 
 
