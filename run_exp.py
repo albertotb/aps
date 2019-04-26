@@ -100,26 +100,31 @@ if __name__ == '__main__':
     d_idx = pd.Index(p.d_values, name='d')
     a_idx = pd.Index(p.a_values, name='a')
 
-    print(args)
-
     #---------------------------------------------------------------------------
     # Attacker-defender game
     #---------------------------------------------------------------------------
     if args.set == 'adg':
+        print('=' * 30)
         print('Game theory')
-        print('-' * 80)
+        print('=' * 30)
 
         if args.alg == 'mcmc':
             print('MCMC')
+            print('-' * 80)
+            print('Iters: {}'.format(args.mcmc))
             with timer():
                 d_opt, a_opt, psi_d, psi_a, t = mcmc_adg(p.d_values, p.a_values,
                                                          p.d_util, p.a_util,
                                                          p.prob, p.prob,
                                                          mcmc_iters=args.mcmc)
-                print(t)
-                
+                print('Elapsed time per attack: ', t)
+
         elif args.alg == 'aps':
             print('APS')
+            print('-' * 80)
+            print('Outer iters: {}'.format(args.aps))
+            print('Inner iters: {}'.format(args.aps_inner))
+            print('Burnin: {}'.format(args.burnin))
             with timer():
                 d_opt, a_opt, psi_d, psi_a = aps_adg(p.d_values, p.a_values,
                                                      p.d_util, p.a_util,
@@ -129,16 +134,17 @@ if __name__ == '__main__':
         else:
             print('Error')
 
-        # a_opt = pd.Series(a_opt, index=d_idx)
-        # psi_d = pd.Series(psi_d, index=d_idx)
-        # psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
+        a_opt = pd.Series(a_opt, index=d_idx)
+        psi_d = pd.Series(psi_d, index=d_idx)
+        psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
         dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a}
     #---------------------------------------------------------------------------
     # ARA
     #---------------------------------------------------------------------------
     elif args.set == 'ara':
-        print('\nARA')
-        print('-' * 80)
+        print('=' * 30)
+        print('ARA')
+        print('=' * 30)
 
         if args.prob:
             p_a = pd.read_pickle('{}'.format(args.prob)).values
@@ -148,6 +154,8 @@ if __name__ == '__main__':
 
         if args.alg == 'mcmc':
             print('MCMC')
+            print('-' * 80)
+            print('Iters: {}'.format(args.mcmc))
             with timer():
                 d_opt, p_a, psi_da, psi_ad = mcmc_ara(p.d_values, p.a_values,
                                                       p.d_util, p.a_util_f, p.prob,
@@ -158,6 +166,10 @@ if __name__ == '__main__':
 
         elif args.alg == 'aps':
             print('APS')
+            print('-' * 80)
+            print('Outer iters: {}'.format(args.aps))
+            print('Inner iters: {}'.format(args.aps_inner))
+            print('Burnin: {}'.format(args.burnin))
             with timer():
                 d_opt, p_a, psi_da, psi_ad = aps_ara(p.d_values, p.a_values,
                                                    p.d_util, p.a_util_f, p.prob,
@@ -168,10 +180,10 @@ if __name__ == '__main__':
         else:
             print('Error')
 
-        # a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
-        # psi_d = pd.Series(psi_da.sum(axis=1), index=d_idx)
-        # psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
-        # p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
+        a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
+        psi_d = pd.Series(psi_da.sum(axis=1), index=d_idx)
+        psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
+        p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
         dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a,
                 'psi_da': psi_da, 'psi_ad': psi_ad, 'p_a': p_a}
         with pd.option_context('display.max_columns', len(p.a_values)):
