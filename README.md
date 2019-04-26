@@ -1,6 +1,6 @@
 # Augmented Probability Simulation
 
-This is the code to run the simulations in the paper "Augmented Probability Simulation Methodsfor Non-cooperative Games".
+This is the code to run the simulations in the paper "Augmented Probability Simulation Methods for Non-cooperative Games".
 
 The folder structure is the following:
 
