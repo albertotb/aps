@@ -146,6 +146,8 @@ if __name__ == '__main__':
         print('ARA')
         print('=' * 30)
 
+        print('ARA iters: {}'.format(args.ara))
+
         if args.prob:
             p_a = pd.read_pickle('{}'.format(args.prob)).values
             print(p_a)
