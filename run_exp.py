@@ -31,7 +31,7 @@ if __name__ == '__main__':
                 dest='module',
                 help='module with problem specific information',
                 default='prob1',
-                choices=['prob1', 'prob2', 'prob3'])
+                choices=['prob1', 'prob2'])
 
     parser.add_argument('-a',
                 dest='alg',
@@ -60,13 +60,13 @@ if __name__ == '__main__':
                 type=int,
                 dest='mcmc',
                 help='Number of MCMC iterations',
-                default=10000)
+                default=100)
 
     parser.add_argument('--ara',
                 type=int,
                 dest='ara',
                 help='Number of ARA iterations',
-                default=1000)
+                default=10)
 
     parser.add_argument('--prob',
                 dest='prob',
@@ -77,13 +77,13 @@ if __name__ == '__main__':
                 type=int,
                 dest='aps',
                 help='Number of outer APS iterations',
-                default=10000)
+                default=100)
 
     parser.add_argument('--aps_inner',
                 type=int,
                 dest='aps_inner',
                 help='Number of inner APS iterations',
-                default=1000)
+                default=10)
 
     parser.add_argument('--burnin',
                 type=float,

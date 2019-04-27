@@ -115,7 +115,7 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
         for j, a in enumerate(a_values):
             def wrapper():
                 a_util = a_util_f()
-                a_prob = a_prob_f()
+                a_prob = a_prob_f(d=d)
                 theta_k = a_prob(d, a, size=mcmc_iters)
                 return a_util(a, theta_k).mean()
 
