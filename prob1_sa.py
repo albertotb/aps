@@ -8,7 +8,7 @@ from mcmc import mcmc_adg, mcmc_ara
 
 if __name__ == '__main__':
 
-    K = 5
+    K = 1000
     iters=100000
 
     e_values = uniform.rvs(scale=2, size=K)
