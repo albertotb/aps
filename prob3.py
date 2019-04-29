@@ -53,11 +53,11 @@ def pl(a, d, a_g, scale_g, a_l, scale_l, size=1):
               .sum(axis=1))
 
 def pm(l, alpha, beta):
-    return np.minimum(1.5e6, 3e6*l*unif(alpha, beta))
+    return 3e6*l*(alpha+beta)/2
 
 def ct(a, p):
     t = binom.rvs(a, p=p) > 0
-    return norm.rvs(2430000, 400000) * t
+    return 2430000 * t
 
 cd = lambda d, l, alpha, beta: cs(d) + pm(l, alpha=alpha, beta=beta)
 ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/CD_MAX) - 1)
