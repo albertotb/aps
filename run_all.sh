@@ -6,7 +6,7 @@ mkdir -p $d
 if [[ -z "$1" || "$1" == "mcmc" ]]; then
     echo "MCMC"
     qsub -N "mcmc_adg_1" -o $d/prob1_mcmc_adg.out -j y ./run_exp.sh -p prob1 -a mcmc -s adg -o $d --mcmc 100000
-    qsub -N "mcmc_ara_1" -o $d/prob1_mcmc_ara.out -j y ./run_exp.sh -p prob1 -a mcmc -s ara -o $d --mcmc 100000 --ara 1000
+    qsub -N "mcmc_ara_1" -o $d/prob1_mcmc_ara.out -j y ./run_exp.sh -p prob1 -a mcmc -s ara -o $d --mcmc 100000 --ara 10000
     qsub -N "mcmc_adg_2" -o $d/prob2_mcmc_adg.out -j y ./run_exp.sh -p prob2 -a mcmc -s adg -o $d --mcmc 100000
     qsub -N "mcmc_ara_2" -o $d/prob2_mcmc_ara.out -j y ./run_exp.sh -p prob2 -a mcmc -s ara -o $d --mcmc 100000 --ara 1000
 fi
