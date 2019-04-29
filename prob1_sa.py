@@ -29,5 +29,5 @@ if __name__ == '__main__':
 
         res.append({'d_opt': d_opt, 'psi_d': psi_d[d_opt]})
 
-    df = pd.DataFrame.from_dict(res))
+    df = pd.DataFrame.from_dict(res)
     df.to_pickle('prob1_sa.pkl')
