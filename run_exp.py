@@ -135,8 +135,8 @@ if __name__ == '__main__':
             print('Error')
 
         a_opt = pd.Series(a_opt, index=d_idx)
-        psi_d = pd.Series(psi_d, index=d_idx)
-        psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
+        psi_d = pd.Series(psi_d)
+        psi_a = pd.Series(psi_a, index=d_idx)
         dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a}
     #---------------------------------------------------------------------------
     # ARA
