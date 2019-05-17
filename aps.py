@@ -143,7 +143,7 @@ def aps_adg(d_values, a_values, d_util, a_util, theta, N_aps=1000,
                 print(i)
 
     d_dist = d_sim[int(burnin*N_aps):]
-    return(mode(d_dist)[0], a_star, a_dist, d_dist)
+    return(mode(d_dist)[0], a_star, d_dist, a_dist)
 
 
 def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
