@@ -31,7 +31,7 @@ if __name__ == '__main__':
                 dest='module',
                 help='module with problem specific information',
                 default='prob1',
-                choices=['prob1', 'prob2', 'prob3'])
+                choices=['prob1', 'prob2', 'prob3', 'prob_new'])
 
     parser.add_argument('-a',
                 dest='alg',
