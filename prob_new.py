@@ -6,15 +6,15 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 # Problem parameters
-D = 100
-c = 50
+D = 1000
+c = 10
 e = 50
-h = 0.5
-k = 0.5
+h = 0.1
+k = 0.2
 
 # Discretization steps
-stepA = 0.1
-stepD = 0.1
+stepA = 0.01
+stepD = 0.01
 
 a_values = np.arange(0, 1, stepA)
 d_values = np.arange(0, 1, stepD)

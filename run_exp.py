@@ -202,9 +202,10 @@ if __name__ == '__main__':
 
     print(d_opt)
     print(a_opt)
-    print(psi_d)
+    #print(psi_d)
     with pd.option_context('display.max_columns', len(p.a_values)):
-        print(psi_a)
+        pass
+	#print(psi_a)
 
     fout = '{}/{}_{}_{}.pkl'.format(args.out, args.module, args.alg, args.set)
     with open(fout, "wb") as f:
