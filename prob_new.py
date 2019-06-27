@@ -23,8 +23,9 @@ d_values = np.arange(0, 1, stepD)
 f = lambda d, theta: (1-theta)*D - c*d
 g = lambda a, theta: theta*D - e*a
 
-alpha = lambda d,a: (a-d)**2
-beta  = lambda d,a: (d-a)**2
+eps = 0.01 # To avoida alpha and beta to be 0
+alpha = lambda d,a: (a-d)**2 + eps
+beta  = lambda d,a: (d-a)**2 + eps
 
 prob   = lambda d, a, size=1: np.random.beta( alpha(d,a), beta(d,a), size=size )
 
