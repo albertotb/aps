@@ -26,7 +26,7 @@ eps = 0.01 # To avoida alpha and beta to be 0
 alpha = lambda d,a: a - d + 1 + eps
 beta  = lambda d,a: d - a + 1 + eps
 
-prob   = lambda d, a, size=1: np.random.beta( alpha(d,a), beta(d,a), size=size )
+prob = lambda d, a, size=1: np.random.beta( alpha(d,a), beta(d,a), size=size )
 
 c1 = 1 - np.exp(-h*D)
 c2 = 1 - np.exp(h*c)

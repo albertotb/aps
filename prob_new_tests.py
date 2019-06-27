@@ -8,46 +8,22 @@ from scipy.stats import mode
 from timeit import default_timer
 from importlib import import_module
 from contextlib import contextmanager
-
+import sys
+sys.path.append('.')
+from prob_new import *
 
 case = "discrete"
 aps = False
 
-# Problem parameters
-D = 100
-c = 50
-e = 50
-h = 0.1
-k = 0.1
-
-# Discretization steps
-stepA = 0.01
-stepD = 0.01
-
-a_values = np.arange(0, 1, stepA)
-d_values = np.arange(0, 1, stepD)
-
-
-f = lambda d, theta: (1-theta)*D - c*d
-g = lambda a, theta: theta*D - e*a
-
-eps = 0.01 # To avoida alpha and beta to be 0
-alpha = lambda d,a: a - d + 1 + eps
-beta  = lambda d,a: d - a + 1 + eps
-
-prob   = lambda d, a, size=1: np.random.beta( alpha(d,a), beta(d,a), size=size )
-
-d_util = lambda d, theta: 1.0 - np.exp( -h * f(d,theta) )
-a_util = lambda a, theta: np.exp(-k * g(a,theta) )
-
 if case == "discrete":
     ##
     a_values = np.arange(0, 1, 0.001)
-    d_given = 0.9
-    a_optimal = 0.999
+    if len(sys.argv) > 1:
+        d_given = float(sys.argv[1])
+    else:
+        d_given = 0.9
+    #a_optimal = 0.999
     mcmc_iters = 10000
-    N_inner = 1000000
-    burnin = 0.5
     ################################################################################
     # MC for attacker. Discrete case
     ################################################################################
@@ -65,6 +41,8 @@ if case == "discrete":
     print('Optimal MC attack for given defense', a_opt)
 
 if aps:
+    N_inner = 1000000
+    burnin = 0.5
     ################################################################################
     # APS for attacker. Discrete case
     ################################################################################
