@@ -62,35 +62,39 @@ if case == "discrete":
     ################################################################################
     # APS for attacker. Discrete case
     ################################################################################
-    # def propose(x_given, x_values, prop = 0.1):
-    #     tochoose = int(len(x_values)*prop)
-    #     if x_given == x_values[0]:
-    #         return( np.random.choice([x_values[1], x_values[-1]],
-    #         p=[0.5, 0.5]) )
-    #
-    #     if x_given == x_values[-1]:
-    #         return( np.random.choice([x_values[0], x_values[-2]],
-    #         p=[0.5, 0.5]) )
-    #
-    #     coin = np.random.choice([0,1])
-    #     idx = list(x_values).index(x_given)
-    #     if coin == 0:
-    #         return( np.random.choice(a_values[idx + 1 : idx + 1 + tochoose]) )
-    #     else:
-    #         return( np.random.choice(a_values[idx + 1 : idx + 1 + tochoose]) )
+    def propose(x_given, x_values, prop = 0.1):
+        tochoose = int(len(x_values)*prop)
 
-    def propose(x_given, x_values):
-        if x_given == x_values[0]:
-            return( np.random.choice([x_values[1], x_values[-1]],
-            p=[0.5, 0.5]) )
-
-        if x_given == x_values[-1]:
-            return( np.random.choice([x_values[0], x_values[-2]],
-            p=[0.5, 0.5]) )
-
+        coin = np.random.choice([0,1])
         idx = list(x_values).index(x_given)
-        return( np.random.choice([x_values[idx+1], x_values[idx-1]],
-        p=[0.5, 0.5]) )
+        if coin == 0:
+            start = idx+1
+            end = start + tochoose
+            if end >= len(a_values):
+                return(np.concatenate((a_values[start:], a_values[:end-len(a_values)])))
+            else:
+                return(np.random.choice(a_values[start:end]))
+        else:
+            start = idx
+            end = start-tochoose
+            if end < 0:
+                return(np.concatenate((a_values[:start], a_values[end:])))
+            else:
+                return(np.random.choice(a_values[start:end]))
+
+
+    #def propose(x_given, x_values):
+    #    if x_given == x_values[0]:
+    #        return( np.random.choice([x_values[1], x_values[-1]],
+    #        p=[0.5, 0.5]) )
+
+    #    if x_given == x_values[-1]:
+    #        return( np.random.choice([x_values[0], x_values[-2]],
+    #        p=[0.5, 0.5]) )
+
+    #    idx = list(x_values).index(x_given)
+    #    return( np.random.choice([x_values[idx+1], x_values[idx-1]],
+    #    p=[0.5, 0.5]) )
 
     a_sim = np.zeros(N_inner, dtype = float)
     a_sim[0] = 0.1
