@@ -5,26 +5,26 @@ import numpy as np
 import pandas as pd
 
 # Problem parameters
-D = 100
+D = 1000
 c = 50
-e = 50
-h = 0.1
-k = 0.1
+e = 10
+h = 1.0
+k = 0.01
 
 # Discretization steps
-stepA = 0.01
+stepA = 0.1
 stepD = 0.01
 
-a_values = np.arange(0, 1, stepA)
+a_values = np.arange(0, 10, stepA)
 d_values = np.arange(0, 1, stepD)
 
 
 f = lambda d, theta: (1-theta)*D - c*d
 g = lambda a, theta: theta*D - e*a
 
-eps = 0.01 # To avoida alpha and beta to be 0
-alpha = lambda d,a: a - d + 1 + eps
-beta  = lambda d,a: d - a + 1 + eps
+eps = 0.01 # To avoid alpha and beta to be 0
+alpha = lambda d,a: np.exp(a - d)  #+ eps
+beta  = lambda d,a: np.exp(d - a)  #+ eps
 
 prob = lambda d, a, size=1: np.random.beta( alpha(d,a), beta(d,a), size=size )
 
