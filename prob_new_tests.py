@@ -11,14 +11,17 @@ import sys
 sys.path.append('.')
 from prob_new import *
 
-case = "discrete"
-aps = False
-d_given = 0.9
+case = "continuous"
+plot = False
+aps = True
+# d_given = 0.9
 
 if case == "discrete":
+    if len(sys.argv) > 1:
+        d_given = float(sys.argv[1])
     ##
     # a_values = np.arange(0, 1, 0.01)
-    #a_optimal = 0.999
+    a_optimal = 0.99
     mcmc_iters = 100000
     ################################################################################
     # MC for attacker. Discrete case
@@ -35,12 +38,14 @@ if case == "discrete":
     print('Elapsed MC time: ', end-start)
     a_opt = a_values[psi_a.argmax()]
     print('Optimal MC attack for given defense', a_opt)
-    df = pd.DataFrame({"Attacks":a_values, "Exp-Ut":psi_a})
-    df.plot.bar(x='Attacks', y='Exp-Ut')
-    plt.show()
+
+    if plot:
+        df = pd.DataFrame({"Attacks":a_values, "Exp-Ut":psi_a})
+        df.plot.bar(x='Attacks', y='Exp-Ut')
+        plt.show()
 
     if aps:
-        N_inner = 1000000
+        N_inner = 10000
         burnin = 0.5
         ################################################################################
         # APS for attacker. Discrete case
@@ -118,7 +123,28 @@ if case == "continuous":
     if len(sys.argv) > 1:
         d_given = float(sys.argv[1])
     ##
-    N_inner = 1000000
+    ############################################################################
+    ### Monte Carlo ############################################################
+    mcmc_iters = 100000
+    ################################################################################
+    # MC for attacker. Discrete case
+    ################################################################################
+    psi_a = np.zeros(len(a_values), dtype=float)
+
+    start = default_timer()
+    ##
+    for j, a in enumerate(a_values):
+        theta_a = prob(d_given, a, size=mcmc_iters)
+        psi_a[j] = a_util(a, theta_a).mean()
+    ##
+    end = default_timer()
+    print('Elapsed MC time: ', end-start)
+    a_opt = a_values[psi_a.argmax()]
+    print('Optimal MC attack for given defense', a_opt)
+    ##
+    ############################################################################
+    ### APS ############################################################
+    N_inner = 100000
     prec = 0.01
     #
     a_sim = np.zeros(N_inner, dtype = float)
@@ -155,7 +181,7 @@ if case == "continuous":
     end = default_timer()
     print('Elapsed APS time: ', end-start)
     ##
-    burnin = 0.5
+    burnin = 0.25
     a_dist = a_sim[int(burnin*N_inner):]
     # a_opt = mode(a_dist)[0][0]
     #a_dist = np.array([1,1,2,2,3,4,5,3.5])
@@ -164,6 +190,7 @@ if case == "continuous":
     #a_opt = mode(a_dist)[0][0]
     print('Optimal APS attack for given defense', a_opt)
 
-    a_d = pd.Series(a_dist)
-    a_d.hist(bins = int(1.0/prec))
-    plt.show()
+    if plot:
+        a_d = pd.Series(a_dist)
+        a_d.hist(bins = int(1.0/prec))
+        plt.show()
