@@ -5,7 +5,7 @@ from joblib import Parallel, delayed
 
 
 def mcmc_adg(d_values, a_values, d_util, a_util, d_prob, a_prob,
-             mcmc_iters=1000):
+             mcmc_iters=1000, info=False):
     """ Computes the solution of an attacker-defender game using MCMC
 
         Parameters
@@ -57,7 +57,9 @@ def mcmc_adg(d_values, a_values, d_util, a_util, d_prob, a_prob,
         times[i] = end - start
 
     d_opt = d_values[psi_d.argmax()]
-    return d_opt, a_opt, psi_d, psi_a, times
+    if info:
+        return d_opt, a_opt, psi_d, psi_a, times
+    return d_opt
 
 
 def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,

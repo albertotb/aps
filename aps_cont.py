@@ -18,7 +18,8 @@ def propose():
 ### Inner APS ##############################################################
 ############################################################################
 
-def innerAPS(d_given, a_util, theta, N_inner=1000, burnin=0.75, prec = 0.01):
+def innerAPS(d_given, a_util, theta, N_inner=1000, burnin=0.75, prec = 0.01,
+    info=False):
     #
     a_sim = np.zeros(N_inner, dtype = float)
     a_sim[0] = 0.5
@@ -39,6 +40,10 @@ def innerAPS(d_given, a_util, theta, N_inner=1000, burnin=0.75, prec = 0.01):
     a_dist = a_sim[int(burnin*N_inner):]
     count, bins = np.histogram(a_dist, bins = int(1.0/prec) )
     a_opt = ( bins[count.argmax()] + bins[count.argmax()+1] ) / 2
+    if info:
+        a_d = pd.Series(a_dist)
+        return a_opt, a_d
+    ##
     return a_opt
 
 ############################################################################
@@ -46,9 +51,9 @@ def innerAPS(d_given, a_util, theta, N_inner=1000, burnin=0.75, prec = 0.01):
 ############################################################################
 
 def aps_adg(d_util, a_util, theta, N_aps=1000,
-                burnin=0.75, N_inner = 4000, prec=0.01):
+                burnin=0.75, N_inner = 4000, prec=0.01, info=False):
 
-    d_sim = np.zeros(N_aps, dtype = int)
+    d_sim = np.zeros(N_aps, dtype = float)
     d_sim[0] = 0.5
     a_sim = innerAPS(d_sim[0], a_util, theta, N_inner=N_inner)
     theta_sim = theta(d_sim[0], a_sim)
@@ -73,4 +78,7 @@ def aps_adg(d_util, a_util, theta, N_aps=1000,
     d_dist = d_sim[int(burnin*N_aps):]
     count, bins = np.histogram(d_dist, bins = int(1.0/prec) )
     d_opt = ( bins[count.argmax()] + bins[count.argmax()+1] ) / 2
-    return(mode(d_dist)[0], d_dist)
+    if info:
+        d_d = pd.Series(d_dist)
+        return d_opt, d_d
+    return(d_opt, d_dist)
