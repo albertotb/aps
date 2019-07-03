@@ -6,7 +6,7 @@ import pandas as pd
 
 # Problem parameters
 D = 10
-c = 50
+c = 1
 e = 1
 h = 1.0
 k = 0.001
