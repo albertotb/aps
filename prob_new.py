@@ -22,7 +22,7 @@ d_values = np.arange(0, 1, stepD)
 f = lambda d, theta: (1-theta)*D - c*d
 g = lambda a, theta: theta*D - e*a
 
-eps = 0.01 # To avoid alpha and beta to be 0
+eps = 1.0 # To avoid alpha and beta to be 0
 alpha = lambda d,a: np.exp(a - 10.0*d)  + eps
 beta  = lambda d,a: np.exp(10.0*d - a)  + eps
 
