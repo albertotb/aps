@@ -45,3 +45,40 @@ def innerAPS(J, d_given, a_util, theta, N_inner=1000, burnin=0.75, prec = 0.01,
         return a_opt, a_d
     ##
     return a_opt
+
+############################################################################
+### Outer APS ##############################################################
+############################################################################
+
+def aps_adg(J, J_inner, d_util, a_util, theta, N_aps=1000,
+                burnin=0.75, N_inner = 4000, prec=0.01, info=False):
+
+    d_sim = np.zeros(N_aps, dtype = float)
+    d_sim[0] = 0.5
+    a_sim = innerAPS(J_inner, d_sim[0], a_util, theta, N_inner=N_inner)
+    theta_sim = theta(d_sim[0], a_sim, size=J)
+
+    for i in range(1,N_aps):
+        ## Update d
+        d_tilde = propose()
+        a_tilde = innerAPS(J_inner, d_tilde, a_util, theta, N_inner=N_inner)
+        theta_tilde = theta(d_tilde, a_tilde, size=J)
+
+        num = d_util(d_tilde, theta_tilde)
+
+        den = d_util(d_sim[i-1], theta_sim)
+
+        if np.random.uniform() <= np.prod(num/den):
+            d_sim[i] = d_tilde
+            a_sim = a_tilde
+            theta_sim = theta_tilde
+        else:
+            d_sim[i] = d_sim[i-1]
+
+    d_dist = d_sim[int(burnin*N_aps):]
+    count, bins = np.histogram(d_dist, bins = int(1.0/prec) )
+    d_opt = ( bins[count.argmax()] + bins[count.argmax()+1] ) / 2
+    if info:
+        d_d = pd.Series(d_dist)
+        return d_opt, d_d
+    return(d_opt, d_dist)
