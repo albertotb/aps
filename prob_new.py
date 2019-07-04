@@ -8,7 +8,7 @@ import pandas as pd
 D = 10
 c = 1
 e = 1
-h = 1.0
+h = 0.001
 k = 0.001
 
 # Discretization steps
