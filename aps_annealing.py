@@ -53,8 +53,8 @@ def innerAPS(J, d_given, a_util, theta, N_inner=1000, mean=False, burnin=0.75, p
 ### Outer APS ##############################################################
 ############################################################################
 
-def aps_adg(J, J_inner, d_util, a_util, theta, N_aps=1000,
-                burnin=0.75, N_inner = 4000, prec=0.01, mean=False, info=False):
+def aps_adg_ann(J, J_inner, d_util, a_util, theta, N_aps=1000,
+                burnin=0.75, N_inner = 4000, prec=0.01, mean=False, info=True):
 
     d_sim = np.zeros(N_aps, dtype = float)
     d_sim[0] = 0.5
