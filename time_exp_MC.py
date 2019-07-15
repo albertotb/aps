@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pickle
 import prob_new as p
 from aps_annealing import *
 from mcmc import *
@@ -42,16 +43,16 @@ def optimal_number_iters(discretization):
         ##
         optimal_d = np.asarray( Parallel(n_jobs=num_cores)(delayed(find_d_opt_MC)(j) for j in mylist) )
         ##
-        ## Are all equal to the truth? Then we converge.
-        if np.all(optimal_d == d_true):
-            n_opt_iters = i
+        percent = np.sum(optimal_d == d_true)/len(optimal_d)
+        ## Are 90% equal to the truth? Then we converge.
+        if percent >= 0.9:
             break
-        ##
-        return n_opt_iters
+    ##
+    return i
 
 if __name__ == '__main__':
 
-    disc = np.array([0.1, 0.01, 0.001, 0.0001])
+    disc = np.array([0.1, 0.001, 0.0001])
     times = np.zeros_like(disc)
     for i, dd in enumerate(disc):
         n_opt_iters = optimal_number_iters(dd)
@@ -62,6 +63,7 @@ if __name__ == '__main__':
         ##
         end = default_timer()
         times[i] = end-start
+        print(dd, times[i])
 
     results = {'Discretization': disc, 'Times': times}
     fout = 'results/times_MC.pkl'
