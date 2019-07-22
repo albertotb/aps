@@ -1,6 +1,5 @@
 *.pkl
 *.out
 *.dat
-results/
 __pycache__/
 **/.ipynb_checkpoints/
