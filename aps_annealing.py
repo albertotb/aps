@@ -92,4 +92,4 @@ def aps_adg_ann(J, J_inner, d_util, a_util, theta, N_aps=1000,
         d_d = pd.Series(d_dist)
         return d_opt, d_d
     ###
-    return(d_opt, d_dist)
+    return d_opt
