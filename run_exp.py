@@ -11,6 +11,7 @@ from contextlib import contextmanager
 sys.path.append('.')
 from mcmc import mcmc_adg, mcmc_ara
 from aps import aps_adg, aps_ara
+from aps_annealing import aps_adg_ann
 
 @contextmanager
 def timer():
@@ -37,7 +38,7 @@ if __name__ == '__main__':
                 dest='alg',
                 help='algorithm',
                 default='mcmc',
-                choices=['mcmc', 'aps'])
+                choices=['mcmc', 'aps', 'aps_annealing'])
 
     parser.add_argument('-s',
                 dest='set',
@@ -91,6 +92,18 @@ if __name__ == '__main__':
                 help='Percentage of iterations to discard',
                 default=0.75)
 
+    parser.add_argument('--aps_temp',
+                type=int,
+                dest='aps_temp',
+                help='Temperature for outer and inner annealing aps',
+                default=1000)
+
+    parser.add_argument('--mean',
+                type=bool,
+                dest='aps_mean',
+                help='Boolean indicating wether to use the mean or not',
+                default=True)
+
     args = parser.parse_args()
 
     p = import_module(args.module)
@@ -117,8 +130,8 @@ if __name__ == '__main__':
                                                          p.d_util, p.a_util,
                                                          p.prob, p.prob,
                                                          mcmc_iters=args.mcmc)
-                print('Elapsed time per attack: ', t)
-	    
+                # print('Elapsed time per attack: ', t)
+
             psi_d = pd.Series(psi_d, index=d_idx)
             psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
 
@@ -134,15 +147,30 @@ if __name__ == '__main__':
                                                      p.prob, N_aps=args.aps,
                                                      burnin=args.burnin,
                                                      N_inner=args.aps_inner)
-	    
+
             psi_d = pd.Series(psi_d)
-            psi_a = pd.Series(psi_a, index=d_idx) 
-	
+            psi_a = pd.Series(psi_a, index=d_idx)
+
+        elif args.alg == 'aps_annealing':
+            print('APS ANNEALING')
+            print('-' * 80)
+            print('Outer iters: {}'.format(args.aps))
+            print('Inner iters: {}'.format(args.aps_inner))
+            print('Burnin: {}'.format(args.burnin))
+            print('Temperature: {}'.format(args.aps_temp))
+            with timer():
+                d_opt, psi_d = aps_adg_ann(args.aps_temp, args.aps_temp, p.d_util, p.a_util,
+                                p.prob, N_aps=args.aps, burnin=args.burnin,
+                                N_inner = args.aps_inner, prec=0.01, mean=args.aps_mean,
+                                info=True)
+
+            psi_d = pd.Series(psi_d)
+
         else:
             print('Error')
 
-        a_opt = pd.Series(a_opt, index=d_idx)
-        dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a}
+        #a_opt = pd.Series(a_opt, index=d_idx)
+        dout = {'d_opt': d_opt, 'psi_d': psi_d}
     #---------------------------------------------------------------------------
     # ARA
     #---------------------------------------------------------------------------
@@ -201,7 +229,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     print(d_opt)
-    print(a_opt)
+    #print(a_opt)
     #print(psi_d)
     with pd.option_context('display.max_columns', len(p.a_values)):
         pass
