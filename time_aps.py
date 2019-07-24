@@ -10,6 +10,7 @@ import multiprocessing
 import sys
 from timeit import default_timer
 from itertools import product
+import math
 
 def optimal_number_iters(d_values, a_values, d_true, disc, times=50, n_jobs=-1):
 
@@ -27,7 +28,9 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=50, n_jobs=-1):
             delayed(find_d_opt)() for j in range(times)
         )
 
-        percent = np.mean(np.array(optimal_d) == d_true)
+        percent = np.mean(
+            np.isclose(np.array(optimal_d), d_true, rtol=disc)
+        )
         ## Are 90% equal to the truth? Then we converge.
         if percent >= 0.9:
             break
@@ -37,7 +40,7 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=50, n_jobs=-1):
 
 if __name__ == '__main__':
 
-    disc_list = np.array([0.1, 0.001, 0.0001])
+    disc_list = np.array([0.1, 0.01, 0.001, 0.0001])
 
     results = []
     for disc in disc_list:
