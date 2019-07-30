@@ -51,7 +51,7 @@ if __name__ == '__main__':
                           p.prob, mcmc_iters=100000, info=False)
 
         iters, temp = optimal_number_iters(d_values, a_values, d_true, disc,
-                                           n_jobs=4)
+                                           n_jobs=6)
 
         start = default_timer()
         d_opt = aps_adg_ann(temp, temp, p.d_util, p.a_util, p.prob,
