@@ -25,7 +25,7 @@ def optimal_number_iters(d_values, a_values, d_true, times=50, n_jobs=-1):
             delayed(find_d_opt_MC)(j) for j in range(times)
         )
 
-        percent = np.mean(np.array(optimal_d) == d_true)
+        percent = np.mean( np.isclose( np.array(optimal_d), d_true ) )
         ## Are 90% equal to the truth? Then we converge.
         if percent >= 0.9:
             break
@@ -34,7 +34,7 @@ def optimal_number_iters(d_values, a_values, d_true, times=50, n_jobs=-1):
 
 if __name__ == '__main__':
 
-    disc_list = np.array([0.1, 0.001, 0.0001])
+    disc_list = np.array([0.1, 0.01])
 
     results = []
     for disc in disc_list:
@@ -58,4 +58,4 @@ if __name__ == '__main__':
         print(disc, time, iters, d_true, d_opt)
 
     df = pd.DataFrame(results)
-    df.to_csv('results/times_mc.csv', index=False)
+    df.to_csv('results/times_mc_0.9_new.csv', index=False)
