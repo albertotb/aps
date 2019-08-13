@@ -197,7 +197,7 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
             attacks distribution
     """
     ## Compute a* for all d
-    if not p_d.shape:
+    if not p_d:
         if verbose:
             print("PREPROCESSING...")
         p_d = np.zeros((len(d_values), len(a_values)), dtype=float)

@@ -14,10 +14,10 @@ import math
 
 def optimal_number_iters(d_values, a_values, d_true, disc, times=50, n_jobs=-1):
 
-    iter_list = [100, 500, 1000]
-    temp_list  = [10, 100, 1000]
+    iter_list = [100, 500, 1000, 2000, 3000, 4000]
+    temp_list  = [10, 100, 1000, 2000, 3000, 4000]
 
-    for iters, temp in product(iter_list, temp_list):
+    for temp, iters in product(temp_list,iter_list):
         def find_d_opt():
             d_opt = aps_adg_ann(temp, temp, p.d_util, p.a_util, p.prob,
                                 N_aps=iters, N_inner=iters, burnin=0.5,
@@ -28,9 +28,12 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=50, n_jobs=-1):
             delayed(find_d_opt)() for j in range(times)
         )
 
-        percent = np.mean(
-            np.isclose(np.array(optimal_d), d_true, rtol=disc)
-        )
+        optimal_d = np.round(optimal_d, int( -np.log10(disc) ) )
+        percent = np.mean( np.isclose( np.array(optimal_d), d_true ) )
+
+        # percent = np.mean(
+        #    np.isclose(np.array(optimal_d), d_true, rtol=disc)
+        #)
         ## Are 90% equal to the truth? Then we converge.
         if percent >= 0.9:
             break
@@ -40,7 +43,7 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=50, n_jobs=-1):
 
 if __name__ == '__main__':
 
-    disc_list = np.array([0.1, 0.01, 0.001, 0.0001])
+    disc_list = np.array([0.1, 0.01])
 
     results = []
     for disc in disc_list:
@@ -67,4 +70,4 @@ if __name__ == '__main__':
         print(disc, time, iters, temp, d_true, d_opt)
 
     df = pd.DataFrame(results)
-    df.to_csv('results/times_aps.csv', index=False)
+    df.to_csv('results/times_aps_09_new.csv', index=False)

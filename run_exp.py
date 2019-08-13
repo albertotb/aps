@@ -206,7 +206,7 @@ if __name__ == '__main__':
             print('Inner iters: {}'.format(args.aps_inner))
             print('Burnin: {}'.format(args.burnin))
             with timer():
-                d_opt, p_a, psi_da, psi_ad = aps_ara(p.d_values, p.a_values,
+                d_opt, p_a, psi_da = aps_ara(p.d_values, p.a_values,
                                                    p.d_util, p.a_util_f, p.prob,
                                                    p.a_prob_f, N_aps=args.aps,
                                                    J=args.ara,
@@ -215,12 +215,13 @@ if __name__ == '__main__':
         else:
             print('Error')
 
-        a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
-        psi_d = pd.Series(psi_da.sum(axis=1), index=d_idx)
-        psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
+        #a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
+        #psi_d = pd.Series(psi_da.sum(axis=1), index=d_idx)
+        #psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
         p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
-        dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a,
-                'psi_da': psi_da, 'psi_ad': psi_ad, 'p_a': p_a}
+        #dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a,
+        #        'psi_da': psi_da, 'psi_ad': psi_ad, 'p_a': p_a}
+        dout = {'d_opt': d_opt, 'psi_da': psi_da, 'p_a': p_a}
         with pd.option_context('display.max_columns', len(p.a_values)):
             print(p_a)
 
@@ -228,7 +229,7 @@ if __name__ == '__main__':
         print('Error')
         sys.exit(1)
 
-    print(d_opt)
+    print("Optimal Defense:", d_opt)
     #print(a_opt)
     #print(psi_d)
     with pd.option_context('display.max_columns', len(p.a_values)):

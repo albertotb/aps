@@ -11,14 +11,23 @@ sys.path.append('.')
 from prob_new import *
 
 ### Proposal Distribution
-def propose():
+def propose_att(current):
     return( np.random.uniform(0,1) )
+
+def propose(current):
+    prop = current + np.random.normal(0, 0.01)
+    return prop
+
+def propose_init(current):
+    prop = current + np.random.normal(0,0.1)
+    return prop
+    
 
 ############################################################################
 ### Inner APS ##############################################################
 ############################################################################
 
-def innerAPS(J, d_given, a_util, theta, N_inner=1000, mean=False, burnin=0.75, prec = 0.01,
+def innerAPS(J, d_given, a_util, theta, N_inner=1000, mean=False, burnin=0.1, prec = 0.01,
     info=False):
     #
     a_sim = np.zeros(N_inner, dtype = float)
@@ -27,7 +36,8 @@ def innerAPS(J, d_given, a_util, theta, N_inner=1000, mean=False, burnin=0.75, p
 
     for i in range(1,N_inner):
         ## Update a
-        a_tilde = propose()
+        a_tilde = propose_att(a_sim[i-1])
+        # a_tilde = propose(a_sim[i-1]) if i > int(N_inner*0.5) else propose_init(a_sim[i-1])
         theta_tilde = theta(d_given, a_tilde, size=J)
         num = a_util(a_tilde, theta_tilde)
         den = a_util(a_sim[i-1], theta_sim)
@@ -63,7 +73,8 @@ def aps_adg_ann(J, J_inner, d_util, a_util, theta, N_aps=1000,
 
     for i in range(1,N_aps):
         ## Update d
-        d_tilde = propose()
+        #d_tilde = propose(d_sim[i-1])
+        d_tilde = propose(d_sim[i-1]) if i > int(N_inner*0.1) else propose_init(d_sim[i-1])
         a_tilde = innerAPS(J_inner, d_tilde, a_util, theta, N_inner=N_inner, mean=mean)
         theta_tilde = theta(d_tilde, a_tilde, size=J)
 

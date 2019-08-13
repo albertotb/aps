@@ -44,7 +44,7 @@ cs = log_interp1d(d_values, d_cost)
 
 #d_values = np.array([0, 2, 5, 10, 50, 100, 200, 250, 300, 350, 400, 450,  500, 750, 1000])
 
-d_values = np.arange(100, 200, 5)
+d_values = np.arange(0, 200, 5)
 
 def pl(a, d, a_g, scale_g, a_l, scale_l, size=1):
     return (np.where(gamma.rvs(a=a_g, scale=scale_g, size=a*size) - d > 0,
