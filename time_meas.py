@@ -22,10 +22,12 @@ times = []
 for i in range(1000):
     start = default_timer()
     ##
-    d_opt = aps_adg_ann(100000, 1000, d_util, a_util, prob, N_aps=1000, burnin=0.1, N_inner=100, prec=0.01, mean=True, 
-                     info=False)
+    #d_opt = aps_adg_ann(100000, 1000, d_util, a_util, prob, N_aps=1000, burnin=0.1, N_inner=100, prec=0.01, mean=True, 
+    #                 info=False)
+    d_opt = mcmc_adg(d_values, a_values, d_util, a_util, prob, prob,
+             mcmc_iters=111000, inner_mcmc_iters=111000, info=True)
     ##
     end = default_timer()
     times.append(end - start)
 
-print(np.mean(times), np.std(times))
+print("MC 0.1:", np.mean(times), np.std(times))
