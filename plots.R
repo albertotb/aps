@@ -26,7 +26,7 @@ ggsave(p, filename = "figs/EU_probtime.eps", device = "eps", dpi = 300)
 
 #  pd.DataFrame({"d": d_values, "EU": psi_d})
 
-costs = read.csv("results/costs.csv")
+costs = read.csv("costs.csv")
 costs = costs[costs$x <= 200,]
 p = ggplot(costs, aes(x = x, y = y)) + geom_line()
 p = p +  theme_bw() + xlab("Amount of protection in gbps") + ylab("Cost in Euros")
