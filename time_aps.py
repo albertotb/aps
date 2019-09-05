@@ -12,16 +12,22 @@ from timeit import default_timer
 from itertools import product
 import math
 
-def optimal_number_iters(d_values, a_values, d_true, disc, times=50, n_jobs=-1):
+def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
 
-    iter_list = [100, 500, 1000, 2000, 3000, 4000]
-    temp_list  = [10, 100, 1000, 2000, 3000, 4000]
+    iter_outer_list = [10, 50, 100, 1000, 10000]
+    iter_inner_list = [10, 50, 100, 1000]
+    temp_outer_list = [10, 40, 1000, 100000, 200000]
+    temp_inner_lits = [10, 40, 100, 1000, 10000]
 
-    for temp, iters in product(temp_list,iter_list):
+    for temp_outer,
+        temp_inner,
+        iter_outer,
+        iter_inner in product(temp_outer_list, temp_inner_list,
+                              iter_outer_list, iter_inner_list):
         def find_d_opt():
-            d_opt = aps_adg_ann(temp, temp, p.d_util, p.a_util, p.prob,
-                                N_aps=iters, N_inner=iters, burnin=0.5,
-                                prec=disc, mean=True, info=False)
+            d_opt = aps_adg_ann(temp_outer, temp_inner, p.d_util, p.a_util,
+                                p.prob, N_aps=iter_outer, N_inner=iter_inner,
+                                burnin=0.5, prec=disc, mean=True, info=False)
             return d_opt
 
         optimal_d = Parallel(n_jobs=n_jobs)(
@@ -38,7 +44,7 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=50, n_jobs=-1):
         if percent >= 0.9:
             break
 
-    return iters, temp
+    return temp_outer, temp_inner, iter_outer, iter_inner
 
 
 if __name__ == '__main__':
@@ -51,23 +57,25 @@ if __name__ == '__main__':
         d_values = np.arange(0, 1, disc)
 
         d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                          p.prob, mcmc_iters=100000, info=False)
+                          p.prob, mcmc_iters=1000000, info=False)
 
-        iters, temp = optimal_number_iters(d_values, a_values, d_true, disc,
-                                           n_jobs=6)
+        temp_outer, temp_inner, iter_outer, iter_inner = optimal_number_iters(
+                d_values, a_values, d_true, disc, n_jobs=6)
 
         start = default_timer()
-        d_opt = aps_adg_ann(temp, temp, p.d_util, p.a_util, p.prob,
-                            N_aps=iters, N_inner=iters, burnin=0.5,
+        d_opt = aps_adg_ann(temp_outer, temp_inner, p.d_util, p.a_util, p.prob,
+                            N_aps=iter_outer, N_inner=iter_inner, burnin=0.5,
                             prec=disc, mean=True, info=False)
         end = default_timer()
         time = end-start
 
-        results.append({'disc': disc, 'time': time,
-                        'iters': iters, 'temp': temp,
-                        'd_true': d_true, 'd_opt': d_opt})
+        results.append({'disc': disc, 'time': time, 'iter_outer': iter_outer,
+                        'iter_inner': iter_inner, 'temp_outer': temp_outer,
+                        'temp_inner': temp_inner, 'd_true': d_true, 
+                        'd_opt': d_opt})
 
-        print(disc, time, iters, temp, d_true, d_opt)
+        print(disc, time, iter_outer, iter_inner, temp_outer, temp_inner, 
+              d_true, d_opt)
 
     df = pd.DataFrame(results)
-    df.to_csv('results/times_aps_09_new.csv', index=False)
+    df.to_csv('results/times_aps_09_new1.csv', index=False)
