@@ -44,13 +44,14 @@ if __name__ == '__main__':
         d_values = np.arange(0, 1, disc)
 
         d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                          p.prob, mcmc_iters=100000, info=False)
+                          p.prob, mcmc_iters=1000000, info=False)
 
         iters, inner = optimal_number_iters(d_values, a_values, d_true, n_jobs=8)
 
         start = default_timer()
         d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                         p.prob, mcmc_iters=iters, mcmc_iters_inner = inner, info=False)
+                         p.prob, mcmc_iters=iters, inner_mcmc_iters = inner,
+                         info=False)
         end = default_timer()
         time = end-start
 
@@ -60,4 +61,4 @@ if __name__ == '__main__':
         print(disc, time, iters, inner, d_true, d_opt)
 
     df = pd.DataFrame(results)
-    df.to_csv('results/times_mc_09_new.csv', index=False)
+    df.to_csv('results/times_mc_09_new1.csv', index=False)
