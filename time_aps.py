@@ -34,8 +34,8 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
             delayed(find_d_opt)() for j in range(times)
         )
 
-        optimal_d = np.round(optimal_d, int( -np.log10(disc) ) )
-        percent = np.mean( np.isclose( np.array(optimal_d), d_true ) )
+        optimal_d = np.round(optimal_d, int(-np.log10(disc)))
+        percent = np.mean(np.isclose(np.array(optimal_d), d_true, rtol=disc))
 
         # percent = np.mean(
         #    np.isclose(np.array(optimal_d), d_true, rtol=disc)
