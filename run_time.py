@@ -21,42 +21,36 @@ if __name__ == '__main__':
     #print(pd.read_csv(sys.argv[1]))
     #print(pd.read_csv(sys.argv[2]))
 
+    if len(sys.argv) == 4:
+        step = float(sys.argv[1])
+        outer_iters = int(sys.argv[2])
+        inner_iters = int(sys.argv[3])
+        fstr = f'''mcmc_adg(d_values, a_values, d_util, a_util, prob, prob,
+                            mcmc_iters={outer_iters},
+                            inner_mcmc_iters={inner_iters}, info=True)'''
+
+    elif len(sys.argv) == 6:
+        step = float(sys.argv[1])
+        outer_iters = int(sys.argv[2])
+        inner_iters = int(sys.argv[3])
+        outer_power = int(sys.argv[4])
+        inner_power = int(sys.argv[5])
+        fstr = f'''aps_adg_ann({outer_power}, {inner_power}, d_util, a_util,
+                               prob, N_aps={outer_iters}, burnin=0.1,
+                               N_inner={inner_iters}, prec={step}, mean=True,
+                               info=False)'''
+    else:
+        print('usage: {} STEP OUTER_ITERS INNER_ITERS'.format(sys.argv[0]))
+        print('       {} STEP OUTER_ITERS INNER_ITERS OUTER_POWER INNER_POWER'.format(sys.argv[0]))
+        sys.exit(1)
+
     n = 50
     r = 3
 
-    step = 0.1
     a_values = np.arange(0, 1, step)
     d_values = np.arange(0, 1, step)
-    t1 = repeat('''mcmc_adg(d_values, a_values, d_util, a_util, prob, prob,
-                            mcmc_iters=1000, inner_mcmc_iters=1000, info=True)
-                ''', number=n, repeat=r, globals=globals())
 
-    """
-    step = 0.01
-    a_values = np.arange(0, 1, step)
-    d_values = np.arange(0, 1, step)
-    t2 = repeat('''mcmc_adg(d_values, a_values, d_util, a_util, prob, prob,
-                            mcmc_iters=111000, inner_mcmc_iters=111000, info=True)
-                ''', number=n, repeat=r, globals=globals())
+    t = repeat(fstr, number=n, repeat=r, globals=globals())
 
-    """
-    t3 = repeat('''aps_adg_ann(40, 40, d_util, a_util, prob, N_aps=50,
-                              burnin=0.1, N_inner=50, prec=0.1, mean=True,
-                              info=False)
-                ''', number=n, repeat=r, globals=globals())
-
-    """
-    t4 = repeat('''aps_adg_ann(100000, 1000, d_util, a_util, prob, N_aps=1000,
-                              burnin=0.1, N_inner=100, prec=0.01, mean=True,
-                              info=False)
-                ''', number=n, repeat=r, globals=globals())
-    """
-    print(t1)
-    #print(t2)
-    print(t3)
-    #print(t4)
-    """ 
-    print(t1)
-    with open('./results/times2.pkl', 'wb') as fp:
-        pkl.dump((t1), fp)
-    """
+    print(sys.argv[1:])
+    print(t)
