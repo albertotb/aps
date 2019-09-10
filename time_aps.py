@@ -14,16 +14,17 @@ import math
 
 def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
 
-    iter_outer_list = [10, 50, 100, 1000, 10000]
-    iter_inner_list = [10, 50, 100, 1000]
-    temp_outer_list = [10, 40, 1000, 100000, 200000]
-    temp_inner_lits = [10, 40, 100, 1000, 10000]
+    temp_inner_list = [10, 40, 100, 1000, 10000]       # 40    1000
+    temp_outer_list = [10, 40, 1000, 100000, 200000]   # 40  100000
+    iter_inner_list = [10, 50, 100, 1000]              # 50     100
+    iter_outer_list = [10, 50, 100, 1000, 10000]       # 50    1000
 
-    for temp_outer,
-        temp_inner,
-        iter_outer,
-        iter_inner in product(temp_outer_list, temp_inner_list,
-                              iter_outer_list, iter_inner_list):
+    # the lists have to be sorted in the product from less impact to more
+    # impact in the complexity of the algorithm
+    for temp_outer, temp_inner, iter_outer, iter_inner in product(temp_inner_list,
+                                                                  temp_outer_list,
+                                                                  iter_inner_list,
+                                                                  iter_outer_list):
         def find_d_opt():
             d_opt = aps_adg_ann(temp_outer, temp_inner, p.d_util, p.a_util,
                                 p.prob, N_aps=iter_outer, N_inner=iter_inner,
@@ -74,8 +75,8 @@ if __name__ == '__main__':
                         'temp_inner': temp_inner, 'd_true': d_true, 
                         'd_opt': d_opt})
 
-        print(disc, time, iter_outer, iter_inner, temp_outer, temp_inner, 
+        print(disc, time, iter_outer, iter_inner, temp_outer, temp_inner,
               d_true, d_opt)
 
     df = pd.DataFrame(results)
-    df.to_csv('results/times_aps_09_new1.csv', index=False)
+    df.to_csv('results/times_aps_09_new2.csv', index=False)
