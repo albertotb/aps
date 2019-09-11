@@ -61,4 +61,4 @@ if __name__ == '__main__':
         print(disc, time, iters, inner, d_true, d_opt)
 
     df = pd.DataFrame(results)
-    df.to_csv('results/times_mc_09_new1.csv', index=False)
+    df.to_csv('results/iters_mc.csv', index=False)

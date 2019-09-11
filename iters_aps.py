@@ -79,4 +79,4 @@ if __name__ == '__main__':
               d_true, d_opt)
 
     df = pd.DataFrame(results)
-    df.to_csv('results/times_aps_09_new2.csv', index=False)
+    df.to_csv('results/iters_aps.csv', index=False)
