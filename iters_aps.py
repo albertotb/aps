@@ -14,10 +14,10 @@ import math
 
 def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
 
-    params = {'J_inner': [10, 40, 100, 1000, 10000],            # 40    1000
-              'J':       [10, 40, 1000, 100000, 200000],        # 40  100000
-              'N_inner': [10, 50, 100, 1000],                   # 50     100
-              'N_aps':   [10, 50, 100, 1000, 2000, 10000]}      # 50    1000
+    params = {'J_inner': [10, 50, 100, 1000, 2000],      # 40    1000
+              'J':       np.arange(1000, 11000, 1000),   # 40  100000
+              'N_inner': [10, 50, 100, 1000, 2000],      # 50     100
+              'N_aps':   [10, 50, 100, 1000, 2000]}      # 50    1000
 
     # the df has to be sorted in the product from less impact to more
     # impact in the complexity of the algorithm
@@ -27,7 +27,7 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
     for _, param in param_df.iterrows():
 
         def find_d_opt():
-            d_opt = aps_adg_ann(p.d_util, p.a_util, p.prob, burnin=0.5,
+            d_opt = aps_adg_ann(p.d_util, p.a_util, p.prob, burnin=0.2,
                                 prec=disc, mean=True, info=False, **param)
             return d_opt
 
@@ -38,6 +38,8 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
         optimal_d = np.round(optimal_d, int(-np.log10(disc)))
         percent = np.mean(np.isclose(np.array(optimal_d), d_true, rtol=disc))
 
+        print("iter_outer: " + str(iter_outer) + "temp_outer: "+ str(temp_outer) + "iter_inner: " + str(iter_inner) + "temp_inner: " + str(temp_inner))
+        print("percent:", percent)
         # percent = np.mean(
         #    np.isclose(np.array(optimal_d), d_true, rtol=disc)
         #)
@@ -50,7 +52,7 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
 
 if __name__ == '__main__':
 
-    disc_list = np.array([0.1, 0.01])
+    disc_list = np.array([0.01])
 
     results = []
     for disc in disc_list:
@@ -59,15 +61,19 @@ if __name__ == '__main__':
 
         #d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
         #                  p.prob, mcmc_iters=1000000, info=False)
+<<<<<<< HEAD
 
         d_true = 1
+=======
+        d_true = 0.46
+>>>>>>> e67d4071079cca6243bf5a54be1af8f074c1a6e0
         temp_outer, temp_inner, iter_outer, iter_inner = optimal_number_iters(
                 d_values, a_values, d_true, disc, n_jobs=10)
 
         break
         start = default_timer()
         d_opt = aps_adg_ann(temp_outer, temp_inner, p.d_util, p.a_util, p.prob,
-                            N_aps=iter_outer, N_inner=iter_inner, burnin=0.5,
+                            N_aps=iter_outer, N_inner=iter_inner, burnin=0.2,
                             prec=disc, mean=True, info=False)
         end = default_timer()
         time = end-start
@@ -81,4 +87,4 @@ if __name__ == '__main__':
               d_true, d_opt)
 
     df = pd.DataFrame(results)
-    df.to_csv('results/iters_aps.csv', index=False)
+    df.to_csv('results/iters_aps_roi_2.csv', index=False)
