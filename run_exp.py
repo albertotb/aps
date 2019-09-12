@@ -159,10 +159,11 @@ if __name__ == '__main__':
             print('Burnin: {}'.format(args.burnin))
             print('Temperature: {}'.format(args.aps_temp))
             with timer():
-                d_opt, psi_d = aps_adg_ann(args.aps_temp, args.aps_temp, p.d_util, p.a_util,
-                                p.prob, N_aps=args.aps, burnin=args.burnin,
-                                N_inner = args.aps_inner, prec=0.01, mean=args.aps_mean,
-                                info=True)
+                d_opt, psi_d = aps_adg_ann(p.d_util, p.a_util, p.prob,
+                                           J=args.aps_temp, J_inner=args.aps_temp,
+                                           N_aps=args.aps, burnin=args.burnin,
+                                           N_inner = args.aps_inner, prec=0.01,
+                                           mean=args.aps_mean, info=True)
 
             psi_d = pd.Series(psi_d)
 

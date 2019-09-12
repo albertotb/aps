@@ -35,10 +35,10 @@ if __name__ == '__main__':
         inner_iters = int(sys.argv[3])
         outer_power = int(sys.argv[4])
         inner_power = int(sys.argv[5])
-        fstr = f'''aps_adg_ann({outer_power}, {inner_power}, d_util, a_util,
-                               prob, N_aps={outer_iters}, burnin=0.1,
+        fstr = f'''aps_adg_ann(d_util, a_util, prob, J={outer_power},
+                               J_inner={inner_power}, N_aps={outer_iters},
                                N_inner={inner_iters}, prec={step}, mean=True,
-                               info=False)'''
+                               burnin=0.2, info=False)'''
     else:
         print('usage: {} STEP OUTER_ITERS INNER_ITERS'.format(sys.argv[0]))
         print('       {} STEP OUTER_ITERS INNER_ITERS OUTER_POWER INNER_POWER'.format(sys.argv[0]))
