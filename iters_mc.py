@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import numpy as np
 import pandas as pd
 import pickle
@@ -12,6 +13,7 @@ from timeit import default_timer
 from itertools import product
 from datetime import datetime
 
+PER_TIMES = 0.9
 TIMES = 10
 N_JOBS = 10
 ITERS_TRUE_SOL = 1000000
@@ -35,7 +37,7 @@ def optimal_number_iters(d_values, a_values, d_true, times=10, n_jobs=1):
 
         percent = np.mean( np.isclose( np.array(optimal_d), d_true ) )
         ## Are 90% equal to the truth? Then we converge.
-        if percent >= 0.9:
+        if percent >= PER_TIMES:
             break
 
     return iters, inner
@@ -47,6 +49,7 @@ if __name__ == '__main__':
         print('usage: {} PREC...'.format(sys.argv[0]))
         sys.exit(1)
 
+    fout = 'results/iters_mc.csv'
     ts = datetime.now().timestamp()
     disc_list = list(map(float, sys.argv[1:]))
 
@@ -68,10 +71,12 @@ if __name__ == '__main__':
         end = default_timer()
         time = end-start
 
-        results.append({'timestamp': ts, 'disc': disc, 'd_true': d_true,
-                        'd_opt': d_opt, 'time': time, 'times': TIMES,
-                        'iters_true_sol': ITERS_TRUE_SOL, 'iters': iters,
-                        'inner': inner})
+        results.append({'timestamp': ts, 'disc': disc, 'time': time,
+                        'd_true': d_true, 'd_opt': d_opt, 'times': TIMES,
+                        'per_times': PER_TIMES, 
+                        'iters_true_sol': ITERS_TRUE_SOL,
+                        'iters': iters, 'inner': inner})
 
+    header = not (os.path.exists(fout) and os.path.getsize(fout) > 0)
     df = pd.DataFrame(results).set_index(['timestamp', 'disc'])
-    df.to_csv('results/iters_mc.csv', mode='a')
+    df.to_csv(fout, mode='a', header=header)
