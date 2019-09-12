@@ -23,14 +23,14 @@ ITERS_TRUE_SOL = 1000000
 def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=1):
 
     params = {'J_inner': [10, 50, 100, 1000, 2000],      # 40    1000
-              'J':       np.arange(1000, 1100, 1000),   # 40  100000
+              'J':       np.arange(1000, 11000, 1000),   # 40  100000
               'N_inner': [10, 50, 100, 1000, 2000],      # 50     100
               'N_aps':   [10, 50, 100, 1000, 2000]}      # 50    1000
 
     # the df has to be sorted in the product from less impact to more
     # impact in the complexity of the algorithm
     param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
-                  .sort_values(by=['N_aps', 'N_inner', 'J', 'J_inner']))
+                  .sort_values(by=['N_aps', 'J', 'N_inner', 'J_inner']))
 
     for _, param in param_df.iterrows():
 
