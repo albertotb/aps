@@ -20,7 +20,8 @@ def optimal_number_iters(d_values, a_values, d_true, times=50, n_jobs=-1):
 
         def find_d_opt_MC(j):
             d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob, 
-                             p.prob, mcmc_iters=iters, inner_mcmc_iters=inner, info=False)
+                             p.prob, mcmc_iters=iters, inner_mcmc_iters=inner,
+                             info=False)
             return d_opt
 
         optimal_d = Parallel(n_jobs=n_jobs)(
