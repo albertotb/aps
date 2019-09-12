@@ -14,7 +14,7 @@ from itertools import product
 from datetime import datetime
 
 PER_TIMES = 0.9
-TIMES = 10
+TIMES = 50
 N_JOBS = 10
 ITERS_TRUE_SOL = 1000000
 
