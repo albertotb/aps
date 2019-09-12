@@ -10,22 +10,27 @@ import multiprocessing
 import sys
 from timeit import default_timer
 from itertools import product
+from datetime import datetime
 
-def optimal_number_iters(d_values, a_values, d_true, times=50, n_jobs=-1):
+TIMES = 10
+N_JOBS = 10
+ITERS_TRUE_SOL = 1000000
+
+def optimal_number_iters(d_values, a_values, d_true, times=10, n_jobs=1):
 
     iters_list = np.arange(1000, 10000000, 1000)
     inner_iters_list = np.arange(100, 100000, 500)
-    #
+
     for inner, iters in product(inner_iters_list, iters_list):
 
-        def find_d_opt_MC(j):
+        def find_d_opt(j):
             d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob, 
                              p.prob, mcmc_iters=iters, inner_mcmc_iters=inner,
                              info=False)
             return d_opt
 
         optimal_d = Parallel(n_jobs=n_jobs)(
-            delayed(find_d_opt_MC)(j) for j in range(times)
+            delayed(find_d_opt)(j) for j in range(times)
         )
 
         percent = np.mean( np.isclose( np.array(optimal_d), d_true ) )
@@ -35,9 +40,15 @@ def optimal_number_iters(d_values, a_values, d_true, times=50, n_jobs=-1):
 
     return iters, inner
 
+
 if __name__ == '__main__':
 
-    disc_list = np.array([0.1, 0.01])
+    if len(sys.argv) < 2:
+        print('usage: {} PREC...'.format(sys.argv[0]))
+        sys.exit(1)
+
+    ts = datetime.now().timestamp()
+    disc_list = list(map(float, sys.argv[1:]))
 
     results = []
     for disc in disc_list:
@@ -45,21 +56,22 @@ if __name__ == '__main__':
         d_values = np.arange(0, 1, disc)
 
         d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                          p.prob, mcmc_iters=1000000, info=False)
+                          p.prob, mcmc_iters=ITERS_TRUE_SOL, info=False)
 
-        iters, inner = optimal_number_iters(d_values, a_values, d_true, n_jobs=8)
+        iters, inner = optimal_number_iters(d_values, a_values, d_true,
+                                            n_jobs=N_JOBS, times=TIMES)
 
         start = default_timer()
         d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                         p.prob, mcmc_iters=iters, inner_mcmc_iters = inner,
+                         p.prob, mcmc_iters=iters, inner_mcmc_iters=inner,
                          info=False)
         end = default_timer()
         time = end-start
 
-        results.append({'disc': disc, 'time': time, 'iters': iters, 'inner': inner,
-                        'd_true': d_true, 'd_opt': d_opt})
+        results.append({'timestamp': ts, 'disc': disc, 'd_true': d_true,
+                        'd_opt': d_opt, 'time': time, 'times': TIMES,
+                        'iters_true_sol': ITERS_TRUE_SOL, 'iters': iters,
+                        'inner': inner})
 
-        print(disc, time, iters, inner, d_true, d_opt)
-
-    df = pd.DataFrame(results)
-    df.to_csv('results/iters_mc.csv', index=False)
+    df = pd.DataFrame(results).set_index(['timestamp', 'disc'])
+    df.to_csv('results/iters_mc.csv', mode='a')

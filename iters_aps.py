@@ -10,9 +10,15 @@ import multiprocessing
 import sys
 from timeit import default_timer
 from itertools import product
+from datetime import datetime
 import math
 
-def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
+BURNIN = 0.2
+TIMES = 10
+N_JOBS = 10
+ITERS_TRUE_SOL = 1000000
+
+def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=1):
 
     params = {'J_inner': [10, 50, 100, 1000, 2000],      # 40    1000
               'J':       np.arange(1000, 11000, 1000),   # 40  100000
@@ -22,12 +28,12 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
     # the df has to be sorted in the product from less impact to more
     # impact in the complexity of the algorithm
     param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
-                  .sort_values(by=['N_aps','N_inner', 'J', 'J_inner']))
+                  .sort_values(by=['N_aps', 'N_inner', 'J', 'J_inner']))
 
     for _, param in param_df.iterrows():
 
         def find_d_opt():
-            d_opt = aps_adg_ann(p.d_util, p.a_util, p.prob, burnin=0.2,
+            d_opt = aps_adg_ann(p.d_util, p.a_util, p.prob, burnin=BURNIN,
                                 prec=disc, mean=True, info=False, **param)
             return d_opt
 
@@ -38,53 +44,43 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=-1):
         optimal_d = np.round(optimal_d, int(-np.log10(disc)))
         percent = np.mean(np.isclose(np.array(optimal_d), d_true, rtol=disc))
 
-        print("iter_outer: " + str(iter_outer) + "temp_outer: "+ str(temp_outer) + "iter_inner: " + str(iter_inner) + "temp_inner: " + str(temp_inner))
-        print("percent:", percent)
-        # percent = np.mean(
-        #    np.isclose(np.array(optimal_d), d_true, rtol=disc)
-        #)
         ## Are 90% equal to the truth? Then we converge.
         if percent >= 0.9:
             break
 
-    return temp_outer, temp_inner, iter_outer, iter_inner
+    return param
 
 
 if __name__ == '__main__':
 
-    disc_list = np.array([0.01])
+    if len(sys.argv) < 2:
+        print('usage: {} PREC...'.format(sys.argv[0]))
+        sys.exit(1)
+
+    ts = datetime.now().timestamp()
+    disc_list = list(map(float, sys.argv[1:]))
 
     results = []
     for disc in disc_list:
         a_values = np.arange(0, 1, disc)
         d_values = np.arange(0, 1, disc)
 
-        #d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-        #                  p.prob, mcmc_iters=1000000, info=False)
-<<<<<<< HEAD
+        d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
+                          p.prob, mcmc_iters=ITERS_TRUE_SOL, info=False)
 
-        d_true = 1
-=======
-        d_true = 0.46
->>>>>>> e67d4071079cca6243bf5a54be1af8f074c1a6e0
-        temp_outer, temp_inner, iter_outer, iter_inner = optimal_number_iters(
-                d_values, a_values, d_true, disc, n_jobs=10)
+        params = optimal_number_iters(d_values, a_values, d_true, disc,
+                                      times=TIMES, n_jobs=N_JOBS)
 
-        break
         start = default_timer()
-        d_opt = aps_adg_ann(temp_outer, temp_inner, p.d_util, p.a_util, p.prob,
-                            N_aps=iter_outer, N_inner=iter_inner, burnin=0.2,
-                            prec=disc, mean=True, info=False)
+        d_opt = aps_adg_ann(p.d_util, p.a_util, p.prob, burnin=BURNIN,
+                            prec=disc, mean=True, info=False, **params)
         end = default_timer()
         time = end-start
 
-        results.append({'disc': disc, 'time': time, 'iter_outer': iter_outer,
-                        'iter_inner': iter_inner, 'temp_outer': temp_outer,
-                        'temp_inner': temp_inner, 'd_true': d_true, 
-                        'd_opt': d_opt})
+        results.append({'timestamp': ts, 'disc': disc, 'd_true': d_true,
+                        'd_opt': d_opt, 'time': time, 'burnin': BURNIN,
+                        'times': TIMES, 'iters_true_sol': ITERS_TRUE_SOL,
+                        **params})
 
-        print(disc, time, iter_outer, iter_inner, temp_outer, temp_inner,
-              d_true, d_opt)
-
-    df = pd.DataFrame(results)
-    df.to_csv('results/iters_aps_roi_2.csv', index=False)
+    df = pd.DataFrame(results).set_index(['timestamp', 'disc'])
+    df.to_csv('results/iters_aps.csv', mode='a')
