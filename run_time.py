@@ -52,5 +52,6 @@ if __name__ == '__main__':
 
     t = repeat(fstr, number=n, repeat=r, globals=globals())
 
-    print(sys.argv[1:])
-    print(t)
+    print('args: ', sys.argv[1:])
+    print('times: ', t)
+    print('min avg:', np.array(t).min()/n)
