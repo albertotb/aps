@@ -22,10 +22,18 @@ ITERS_TRUE_SOL = 1000000
 
 def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=1):
 
-    params = {'J_inner': [10, 50, 100],      # 40    1000
-              'J':       np.arange(1000, 11000, 100),   # 40  100000
-              'N_inner': [10, 50, 100],      # 50     100
-              'N_aps':   np.arange(300, 1000, 100)}      # 50    1000
+    
+    # Precision : 0.1
+    params = {'J_inner': [1, 5, 10, 20, 50, 100],      # 40    1000
+              'J':       np.arange(1, 1100, 5),   # 40  100000
+              'N_inner': [5, 10, 50, 100],      # 50     100
+              'N_aps':   np.arange(10, 110, 10)}      # 50    1000
+    
+    # Precision : 0.01
+    # params = {'J_inner': [10, 50, 100],      # 40    1000
+    #          'J':       np.arange(1000, 11000, 1000),   # 40  100000
+    #          'N_inner': [10, 50, 100],      # 50     100
+    #          'N_aps':   np.arange(100, 1000, 100)}      # 50    1000
 
     # the df has to be sorted in the product from less impact to more
     # impact in the complexity of the algorithm

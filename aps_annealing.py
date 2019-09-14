@@ -31,7 +31,7 @@ def innerAPS(J, d_given, a_util, theta, N_inner=1000, mean=False, burnin=0.1, pr
     info=False):
     #
     a_sim = np.zeros(N_inner, dtype = float)
-    a_sim[0] = 0.5
+    a_sim[0] = np.random.uniform()
     theta_sim = theta(d_given, a_sim[0], size=J)
 
     for i in range(1,N_inner):
@@ -67,7 +67,7 @@ def aps_adg_ann(d_util, a_util, theta, J=10, J_inner=10, N_aps=1000,
                 burnin=0.75, N_inner = 4000, prec=0.01, mean=False, info=True):
 
     d_sim = np.zeros(N_aps, dtype = float)
-    d_sim[0] = 0.5
+    d_sim[0] = np.random.uniform()
     a_sim = innerAPS(J_inner, d_sim[0], a_util, theta, N_inner=N_inner, mean=mean)
     theta_sim = theta(d_sim[0], a_sim, size=J)
 
