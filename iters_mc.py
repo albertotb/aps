@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import pickle
 import prob_new as p
-from aps_annealing import *
 from mcmc import *
 from joblib import Parallel, delayed
 import multiprocessing
@@ -26,7 +25,7 @@ def optimal_number_iters(d_values, a_values, d_true, times=10, n_jobs=1):
     for inner, iters in product(inner_iters_list, iters_list):
 
         def find_d_opt(j):
-            d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob, 
+            d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
                              p.prob, mcmc_iters=iters, inner_mcmc_iters=inner,
                              info=False)
             return d_opt
@@ -46,7 +45,7 @@ def optimal_number_iters(d_values, a_values, d_true, times=10, n_jobs=1):
 if __name__ == '__main__':
 
     if len(sys.argv) < 2:
-        print('usage: {} PREC...'.format(sys.argv[0]))
+        print('usage: {} PREC..'.format(sys.argv[0]))
         sys.exit(1)
 
     fout = 'results/iters_mc.csv'
@@ -73,7 +72,7 @@ if __name__ == '__main__':
 
         results.append({'timestamp': ts, 'disc': disc, 'time': time,
                         'd_true': d_true, 'd_opt': d_opt, 'times': TIMES,
-                        'per_times': PER_TIMES, 
+                        'per_times': PER_TIMES,
                         'iters_true_sol': ITERS_TRUE_SOL,
                         'iters': iters, 'inner': inner})
 

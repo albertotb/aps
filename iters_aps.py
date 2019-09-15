@@ -5,14 +5,12 @@ import pandas as pd
 import pickle
 import prob_new as p
 from aps_annealing import *
-from mcmc import *
 from joblib import Parallel, delayed
 import multiprocessing
 import sys
 from timeit import default_timer
 from itertools import product
 from datetime import datetime
-import math
 
 BURNIN = 0.2
 PER_TIMES = 0.9
@@ -56,7 +54,7 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=1):
 if __name__ == '__main__':
 
     if len(sys.argv) < 2:
-        print('usage: {} PREC...'.format(sys.argv[0]))
+        print('usage: {} PREC..'.format(sys.argv[0]))
         sys.exit(1)
 
     fout = 'results/iters_aps.csv'
