@@ -38,7 +38,7 @@ if __name__ == '__main__':
         fstr = f'''aps_adg_ann(d_util, a_util, prob, J={outer_power},
                                J_inner={inner_power}, N_aps={outer_iters},
                                N_inner={inner_iters}, prec={step}, mean=True,
-                               burnin=0.2, info=False)'''
+                               burnin=0.05, info=False)'''
     else:
         print('usage: {} STEP OUTER_ITERS INNER_ITERS'.format(sys.argv[0]))
         print('       {} STEP OUTER_ITERS INNER_ITERS OUTER_POWER INNER_POWER'.format(sys.argv[0]))
