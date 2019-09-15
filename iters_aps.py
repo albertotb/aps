@@ -20,18 +20,23 @@ ITERS_TRUE_SOL = 1000000
 
 def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=1):
 
-    
+
     # Precision : 0.1
-    params = {'J_inner': [1, 5, 10, 20, 50, 100],      # 40    1000
-              'J':       np.arange(1, 1100, 5),   # 40  100000
-              'N_inner': [5, 10, 50, 100],      # 50     100
-              'N_aps':   np.arange(10, 110, 10)}      # 50    1000
-    
+    #params = {'J_inner': [1, 5, 10, 20, 50, 100],
+    #          'J':       np.arange(1, 1100, 5),
+    #          'N_inner': [5, 10, 50, 100],
+    #          'N_aps':   np.arange(10, 110, 10)}
+
     # Precision : 0.01
-    # params = {'J_inner': [10, 50, 100],      # 40    1000
-    #          'J':       np.arange(1000, 11000, 1000),   # 40  100000
-    #          'N_inner': [10, 50, 100],      # 50     100
-    #          'N_aps':   np.arange(100, 1000, 100)}      # 50    1000
+    #params = {'J_inner': [10, 50, 100],
+    #          'J':       np.arange(1000, 11000, 1000),
+    #          'N_inner': [10, 50, 100],
+    #          'N_aps':   np.arange(100, 1100, 100)}
+
+    params = {'J_inner': [10, 50, 100],
+              'J':       np.arange(10, 110, 10) * int(1/disc),
+              'N_inner': [10, 50, 100],
+              'N_aps':   np.arange(1, 11, 1) * int(1/disc)}
 
     # the df has to be sorted in the product from less impact to more
     # impact in the complexity of the algorithm
@@ -51,7 +56,7 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=1):
 
         optimal_d = np.round(optimal_d, int(-np.log10(disc)))
         percent = np.mean(np.isclose(np.array(optimal_d), d_true, rtol=disc))
-        
+
         print(param)
         print("Percentage:", percent)
         ## Are 90% equal to the truth? Then we converge.
@@ -76,9 +81,8 @@ if __name__ == '__main__':
         a_values = np.arange(0, 1, disc)
         d_values = np.arange(0, 1, disc)
 
-        d_true = 0.46
-        #d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-        #                  p.prob, mcmc_iters=ITERS_TRUE_SOL, info=False)
+        d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
+                          p.prob, mcmc_iters=ITERS_TRUE_SOL, info=False)
 
         params = optimal_number_iters(d_values, a_values, d_true, disc,
                                       times=TIMES, n_jobs=N_JOBS)
