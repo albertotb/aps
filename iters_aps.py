@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pickle
 import prob_new as p
+from mcmc import *
 from aps_annealing import *
 from joblib import Parallel, delayed
 import multiprocessing
@@ -82,7 +83,7 @@ if __name__ == '__main__':
         d_values = np.arange(0, 1, disc)
 
         d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                          p.prob, mcmc_iters=ITERS_TRUE_SOL, info=False)
+                          p.prob, iters=ITERS_TRUE_SOL, info=False)
 
         params = optimal_number_iters(d_values, a_values, d_true, disc,
                                       times=TIMES, n_jobs=N_JOBS)

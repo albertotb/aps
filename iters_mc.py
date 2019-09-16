@@ -26,8 +26,7 @@ def optimal_number_iters(d_values, a_values, d_true, times=10, n_jobs=1):
 
         def find_d_opt(j):
             d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                             p.prob, mcmc_iters=iters, inner_mcmc_iters=inner,
-                             info=False)
+                             p.prob, iters=iters, inner_iters=inner, info=False)
             return d_opt
 
         optimal_d = Parallel(n_jobs=n_jobs)(
@@ -58,15 +57,14 @@ if __name__ == '__main__':
         d_values = np.arange(0, 1, disc)
 
         d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                          p.prob, mcmc_iters=ITERS_TRUE_SOL, info=False)
+                          p.prob, iters=ITERS_TRUE_SOL, info=False)
 
         iters, inner = optimal_number_iters(d_values, a_values, d_true,
                                             n_jobs=N_JOBS, times=TIMES)
 
         start = default_timer()
         d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                         p.prob, mcmc_iters=iters, inner_mcmc_iters=inner,
-                         info=False)
+                         p.prob, iters=iters, inner_iters=inner, info=False)
         end = default_timer()
         time = end-start
 

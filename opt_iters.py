@@ -27,8 +27,7 @@ def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
         params = {'iters': np.arange(1000, 10000000, 1000),
                   'iters_inner': np.arange(100, 100000, 500)}
 
-        param_df = (pd.DataFrame(product(*params.values()),
-                                 columns=params.keys())
+        param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
                       .sort_values(by=['iters', 'iters_inner']))
 
     elif alg == 'aps':
@@ -37,8 +36,7 @@ def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
                   'N_inner': [10, 50, 100],
                   'N_aps':   np.arange(1, 11, 1) * int(1/disc)}
 
-        param_df = (pd.DataFrame(product(*params.values()),
-                                 columns=params.keys())
+        param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
                       .sort_values(by=['N_aps', 'J', 'N_inner', 'J_inner']))
 
     else:
