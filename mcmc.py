@@ -5,7 +5,7 @@ from joblib import Parallel, delayed
 
 
 def mcmc_adg(d_values, a_values, d_util, a_util, d_prob, a_prob,
-             mcmc_iters=1000, inner_mcmc_iters=1000, info=True):
+             iters=1000, inner_iters=1000, info=True):
     """ Computes the solution of an attacker-defender game using MCMC
 
         Parameters
@@ -48,11 +48,11 @@ def mcmc_adg(d_values, a_values, d_util, a_util, d_prob, a_prob,
     for i, d in enumerate(d_values):
         start = default_timer()
         for j, a in enumerate(a_values):
-            theta_a = a_prob(d, a, size=inner_mcmc_iters)
+            theta_a = a_prob(d, a, size=inner_iters)
             psi_a[i, j] = a_util(a, theta_a).mean()
         a_opt[i] = a_values[psi_a[i, :].argmax()]
         end = default_timer()
-        theta_d = d_prob(d, a_opt[i], size=mcmc_iters)
+        theta_d = d_prob(d, a_opt[i], size=iters)
         psi_d[i] = d_util(d, theta_d).mean()
         times[i] = end - start
 
@@ -63,7 +63,7 @@ def mcmc_adg(d_values, a_values, d_util, a_util, d_prob, a_prob,
 
 
 def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
-             mcmc_iters=1000, ara_iters=1000, n_jobs=1):
+             iters=1000, ara_iters=1000, n_jobs=1):
     """ Computes the solution of ARA using MCMC
 
         Parameters
@@ -118,7 +118,7 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
             def wrapper():
                 a_util = a_util_f()
                 a_prob = a_prob_f(d=d)
-                theta_k = a_prob(d, a, size=mcmc_iters)
+                theta_k = a_prob(d, a, size=iters)
                 return a_util(a, theta_k).mean()
 
             with Parallel(n_jobs=n_jobs) as parallel:
@@ -130,7 +130,7 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
                                  minlength=len(a_values)) / ara_iters)
 
         for j, a in enumerate(a_values):
-            theta_d = d_prob(d, a, size=mcmc_iters)
+            theta_d = d_prob(d, a, size=iters)
             psi_d[i, j] = (d_util(d, theta_d)*p_a[i, j]).mean()
 
     d_opt = d_values[psi_d.sum(axis=1).argmax()]
