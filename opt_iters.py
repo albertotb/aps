@@ -16,7 +16,7 @@ from datetime import datetime
 BURNIN = 0.05
 PER_TIMES = 0.9
 TIMES = 50
-N_JOBS = 10
+N_JOBS = 16
 ITERS_TRUE_SOL = 1000000
 
 def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
@@ -25,8 +25,8 @@ def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
     # the df has to be sorted in the product from less impact to more
     # impact in the complexity of the algorithm
     if alg == 'mcmc':
-        params = {'iters': np.arange(1000, 10000000, 1000),
-                  'inner_iters': np.arange(100, 100000, 500)}
+        params = {'iters': np.arange(1000, 51000, 1000),
+                  'inner_iters': np.arange(100, 11000, 100)}
 
         param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
                       .sort_values(by=['iters', 'inner_iters']))
