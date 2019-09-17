@@ -5,6 +5,7 @@ import pandas as pd
 import pickle
 import prob_new as p
 from aps_annealing import *
+from mcmc import *
 from joblib import Parallel, delayed
 import multiprocessing
 import sys
@@ -25,10 +26,10 @@ def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
     # impact in the complexity of the algorithm
     if alg == 'mcmc':
         params = {'iters': np.arange(1000, 10000000, 1000),
-                  'iters_inner': np.arange(100, 100000, 500)}
+                  'inner_iters': np.arange(100, 100000, 500)}
 
         param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
-                      .sort_values(by=['iters', 'iters_inner']))
+                      .sort_values(by=['iters', 'inner_iters']))
 
     elif alg == 'aps':
         params = {'J_inner': [10, 50, 100],
@@ -47,12 +48,12 @@ def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
 
         def find_d_opt():
             if alg == 'mcmc':
-                d_opt = aps_adg_ann(p.d_util, p.a_util, p.prob, burnin=BURNIN,
-                                    prec=disc, mean=True, info=False, **param)
+                d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util,
+                                 p.prob, p.prob, info=False, **param)
 
             elif alg == 'aps':
-                d_opt = mcmc_adg(d_values, a_values, p.d_util, p.a_util,
-                                 p.prob, p.prob, **param, info=False)
+                d_opt = aps_adg_ann(p.d_util, p.a_util, p.prob, burnin=BURNIN,
+                                    prec=disc, mean=True, info=False, **param)
 
             else:
                 raise ValueError
@@ -94,7 +95,7 @@ if __name__ == '__main__':
         start = default_timer()
 
         d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                          p.prob, mcmc_iters=ITERS_TRUE_SOL, info=False)
+                          p.prob, iters=ITERS_TRUE_SOL, info=False)
 
         params = optimal_number_iters(alg, d_values, a_values, d_true, disc,
                                       times=TIMES, n_jobs=N_JOBS)
@@ -103,9 +104,8 @@ if __name__ == '__main__':
         time = end-start
 
         results.append({'timestamp': ts, 'alg': alg, 'disc': disc,
-                        'time': time, 'd_true': d_true, 'd_opt': d_opt,
-                        'burnin': BURNIN, 'times': TIMES,
-                        'per_times': PER_TIMES,
+                        'time': time, 'd_true': d_true, 'burnin': BURNIN,
+                        'times': TIMES, 'per_times': PER_TIMES,
                         'iters_true_sol': ITERS_TRUE_SOL, **params})
 
     header = not (os.path.exists(fout) and os.path.getsize(fout) > 0)
