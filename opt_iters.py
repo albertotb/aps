@@ -82,10 +82,10 @@ if __name__ == '__main__':
         print('usage: {} ALG PRECISION..'.format(sys.argv[0]))
         sys.exit(1)
 
-    fout = 'results/opt_iters.csv'
     ts = datetime.now().timestamp()
     alg = sys.argv[1]
     disc_list = list(map(float, sys.argv[2:]))
+    fout = f'results/iters_{alg}.csv'
 
     results = []
     for disc in disc_list:
@@ -103,9 +103,9 @@ if __name__ == '__main__':
         end = default_timer()
         time = end-start
 
-        results.append({'timestamp': ts, 'alg': alg, 'disc': disc,
-                        'time': time, 'd_true': d_true, 'burnin': BURNIN,
-                        'times': TIMES, 'per_times': PER_TIMES,
+        results.append({'timestamp': ts, 'disc': disc, 'time': time,
+                        'd_true': d_true, 'burnin': BURNIN, 'times': TIMES,
+                        'per_times': PER_TIMES,
                         'iters_true_sol': ITERS_TRUE_SOL, **params})
 
     header = not (os.path.exists(fout) and os.path.getsize(fout) > 0)
