@@ -6,7 +6,7 @@ from joblib import Parallel, delayed
 disc   = 0.001
 times  = 30
 iters  = 10000000
-inner  = 10000
+inner  = 100000
 n_jobs = 16
 
 a_values = np.arange(0, 1, disc)
