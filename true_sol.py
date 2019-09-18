@@ -4,8 +4,8 @@ from mcmc import *
 from joblib import Parallel, delayed
 
 disc   = 0.001
-times  = 50
-iters  = 1000000
+times  = 30
+iters  = 10000000
 inner  = 1000
 n_jobs = 16
 
@@ -17,9 +17,12 @@ def find_d_opt():
                      p.prob, iters=iters, inner_iters=inner, info=False)
     return d_opt
 
-d_opt = Parallel(n_jobs=n_jobs)(
-           delayed(find_d_opt)() for j in range(times)
-)
+if times == 1:
+    d_opt = find_d_opt()
+else:
+    d_opt = Parallel(n_jobs=n_jobs)(
+               delayed(find_d_opt)() for j in range(times)
+    )
 
 after_dot = str(disc).split('.', 1)[-1]
 np.save(f'sol_{after_dot}.npy', np.array(d_opt))
