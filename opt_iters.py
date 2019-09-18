@@ -19,23 +19,27 @@ TIMES = 50
 N_JOBS = 16
 ITERS_TRUE_SOL = 1000000
 
+# np.arange but including also last element
+arange1 = lambda start, stop, step=1: np.arange(start, stop+1, step)
+
+
 def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
                          n_jobs=1):
 
     # the df has to be sorted in the product from less impact to more
     # impact in the complexity of the algorithm
     if alg == 'mcmc':
-        params = {'iters': np.arange(1000, 1001000, 1000),
-                  'inner_iters': np.arange(100, 100100, 100)}
+        params = {'iters': arange1(1000, 1000000, 1000),
+                  'inner_iters': arange1(100, 100000, 100)}
 
         param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
                       .sort_values(by=['iters', 'inner_iters']))
 
     elif alg == 'aps':
         params = {'J_inner': [10, 20, 50, 100],
-                  'J':       np.arange(10, 110, 10) * int(1/disc),
+                  'J':       arange1(10, 100, 10) * int(1/disc),
                   'N_inner': [10, 20, 50, 100],
-                  'N_aps':   np.arange(1, 11, 1) * int(1/disc)}
+                  'N_aps':   arange1(1, 10, 1) * int(1/disc)}
 
         param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
                       .sort_values(by=['N_aps', 'J', 'N_inner', 'J_inner']))
