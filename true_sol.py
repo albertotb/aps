@@ -6,7 +6,7 @@ from joblib import Parallel, delayed
 disc   = 0.001
 times  = 30
 iters  = 10000000
-inner  = 1000
+inner  = 10000
 n_jobs = 16
 
 a_values = np.arange(0, 1, disc)
@@ -25,4 +25,4 @@ else:
     )
 
 after_dot = str(disc).split('.', 1)[-1]
-np.save(f'sol_{after_dot}.npy', np.array(d_opt))
+np.save(f'./results/sol_{after_dot}.npy', np.array(d_opt))
