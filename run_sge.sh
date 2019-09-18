@@ -2,5 +2,5 @@
 #$ -cwd
 #$ -j y
 #$ -q all.q
-#$ -pe omp 16
+# -pe omp 16
 python $@
