@@ -25,16 +25,16 @@ def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
     # the df has to be sorted in the product from less impact to more
     # impact in the complexity of the algorithm
     if alg == 'mcmc':
-        params = {'iters': np.arange(1000, 51000, 1000),
-                  'inner_iters': np.arange(100, 11000, 100)}
+        params = {'iters': np.arange(1000, 1001000, 1000),
+                  'inner_iters': np.arange(100, 100100, 100)}
 
         param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
                       .sort_values(by=['iters', 'inner_iters']))
 
     elif alg == 'aps':
-        params = {'J_inner': [10, 50, 100],
+        params = {'J_inner': [10, 20, 50, 100],
                   'J':       np.arange(10, 110, 10) * int(1/disc),
-                  'N_inner': [10, 50, 100],
+                  'N_inner': [10, 20, 50, 100],
                   'N_aps':   np.arange(1, 11, 1) * int(1/disc)}
 
         param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
@@ -103,10 +103,12 @@ if __name__ == '__main__':
         end = default_timer()
         time = end-start
 
-        results.append({'timestamp': ts, 'disc': disc, 'time': time,
-                        'd_true': d_true, 'burnin': BURNIN, 'times': TIMES,
-                        'per_times': PER_TIMES,
+        results.append({'timestamp': ts, 'disc': disc, 'per_times': PER_TIMES,
+                        'time': time, 'd_true': d_true, 'times': TIMES,
                         'iters_true_sol': ITERS_TRUE_SOL, **params})
+
+        if alg == 'aps':
+            results['burnin'] = BURNIN
 
     header = not (os.path.exists(fout) and os.path.getsize(fout) > 0)
     df = pd.DataFrame(results).set_index(['timestamp', 'disc'])
