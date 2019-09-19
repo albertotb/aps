@@ -34,9 +34,9 @@ def optimal_number_iters(d_values, a_values, d_true, disc, times=10, n_jobs=1):
     #          'N_inner': [10, 50, 100],
     #          'N_aps':   np.arange(100, 1100, 100)}
 
-    params = {'J_inner': [10, 50, 100],
+    params = {'J_inner': [10, 20, 50, 100],
               'J':       np.arange(10, 110, 10) * int(1/disc),
-              'N_inner': [10, 50, 100],
+              'N_inner': [10, 20, 50, 100],
               'N_aps':   np.arange(1, 11, 1) * int(1/disc)}
 
     # the df has to be sorted in the product from less impact to more

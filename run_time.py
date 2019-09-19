@@ -26,8 +26,8 @@ if __name__ == '__main__':
         outer_iters = int(sys.argv[2])
         inner_iters = int(sys.argv[3])
         fstr = f'''mcmc_adg(d_values, a_values, d_util, a_util, prob, prob,
-                            mcmc_iters={outer_iters},
-                            inner_mcmc_iters={inner_iters}, info=True)'''
+                            iters={outer_iters}, inner_iters={inner_iters}, 
+                            info=True)'''
 
     elif len(sys.argv) == 6:
         step = float(sys.argv[1])

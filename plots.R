@@ -1,5 +1,19 @@
 library(ggplot2)
 library(reshape2)
+
+## Sensitivity Analysis
+dist = read.csv("results/sa_results.csv")
+
+
+p = ggplot(dist, aes(x = pert_dec)) 
+p = p + geom_bar(aes(y=..density..), position = "dodge", width = 1) +
+  scale_y_continuous(limits=c(0,1))
+p = p +  theme_bw() + xlab("Optimal Decision") + ylab("Density")
+p
+
+ggsave(p, filename = "img/SA.eps", device = "eps", dpi = 300)
+
+
 ## APS solution real problem
 dist = read.csv("results/dist_APS.csv")
 p = ggplot(dist, aes(x = X0)) + geom_histogram(aes(y=(..count..)/sum(..count..)), bins = 40, colour="black", fill="white")
