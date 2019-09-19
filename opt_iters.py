@@ -41,6 +41,11 @@ def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
                   'N_inner': [10, 20, 50, 100],
                   'N_aps':   arange1(1, 10, 1) * int(1/disc)}
 
+        params = {'J_inner': [1, 5, 10, 20, 50, 100],
+                  'J':       np.arange(1, 1100, 5),
+                  'N_inner': [5, 10, 50, 100],
+                  'N_aps':   np.arange(10, 110, 10)}
+
         param_df = (pd.DataFrame(product(*params.values()), columns=params.keys())
                       .sort_values(by=['N_aps', 'J', 'N_inner', 'J_inner']))
 
@@ -112,7 +117,7 @@ if __name__ == '__main__':
                         'iters_true_sol': ITERS_TRUE_SOL, **params})
 
         if alg == 'aps':
-            results['burnin'] = BURNIN
+            results[-1]['burnin'] = BURNIN
 
     header = not (os.path.exists(fout) and os.path.getsize(fout) > 0)
     df = pd.DataFrame(results).set_index(['timestamp', 'disc'])
