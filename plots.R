@@ -5,13 +5,13 @@ library(reshape2)
 dist = read.csv("results/sa_results.csv")
 
 
-p = ggplot(dist, aes(x = pert_dec)) 
-p = p + geom_bar(aes(y=..density..), position = "dodge", width = 1) +
-  scale_y_continuous(limits=c(0,1))
-p = p +  theme_bw() + xlab("Optimal Decision") + ylab("Density")
-p
+p <- ggplot(dist, aes(x = pert_dec)) + 
+  geom_bar(aes(y=..density..), position = "dodge", width = 1) +
+  scale_y_continuous(limits=c(0,1)) + 
+  xlab("Optimal Decision") + 
+  ylab("Density")
 
-ggsave(p, filename = "img/SA.eps", device = "eps", dpi = 300)
+ggsave(p, filename = "img/SA.pdf", dpi = 300)
 
 
 ## APS solution real problem

@@ -1,44 +1,80 @@
 library(ggplot2)
-library(reshape2)
-library(plyr)
+library(tidyr)
+library(stringr)
+library(dplyr)
 
-## Problem 1 - APS
+## Figure 3
+data <- read.csv("results/prob1_aps_psia.csv", col.names = 0:9, check.names = FALSE)
+data_n <- data %>% 
+  gather(key = "d", value = "a", convert = TRUE) %>%
+  mutate(d = factor(d), a = factor(a)) %>%
+  group_by(d, a) %>%
+  summarize(Density = n()/nrow(.))
 
-dist = read.csv("results/prob1_aps_psid.csv")
-dens = count(dist)
-dens$freq = dens$freq/nrow(dist)
+p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
+  geom_col(position = "dodge")
 
-p = ggplot(dens, aes(x=samps, y=freq))
-p = p + geom_bar(stat="identity", colour="black", fill = "white")
-p = p +  theme_bw() + xlab("Optimal Decision") + ylab("Density")
-p = p + scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
-p
-ggsave(p, filename = "img/prob1_aps_psid.eps", device = "eps", dpi = 300)
-
-####
-
-dist = read.csv("results/prob1_mc_psid.csv")
-dist$decision = 0:9
-
-p = ggplot(dist, aes(x=decision, y=psi_d))
-p = p + geom_bar(stat="identity", colour="black", fill = "white")
-p = p +  theme_bw() + xlab("Optimal Decision") + ylab("Expected Utility")
-p = p + scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
-p
-
-ggsave(p, filename = "img/prob1_mcmc_psid.eps", device = "eps", dpi = 300)
-
-###
-
-psia = read.csv("results/prob1_aps_psia.csv")
-## Sensitivity Analysis
-dist = read.csv("results/sa_results.csv")
+ggsave(p, filename = "img/prob1_aps_psia.pdf", dpi = 300)
 
 
-p = ggplot(dist)
-p = p + geom_histogram(aes(x = pert_dec, y = ..density..), colour="black", fill = "white", bins = 12)
-p = p +  theme_bw() + xlab("Optimal Decision") + ylab("Density")
-p = p + scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
-p
+data <- read.csv("results/prob1_mc_psia.csv", 
+                 col.names = c(0, 1), 
+                 check.names = FALSE)
 
-ggsave(p, filename = "img/SA.eps", device = "eps", dpi = 300)
+data_n <- data %>%
+  mutate(d = factor(0:9)) %>%
+  gather(-d, key = "a", value = "Density", convert = TRUE) %>%
+  mutate(a = factor(a))
+  
+p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
+  geom_col(position = "dodge")
+
+ggsave(p, filename = "img/prob1_mc_psia.pdf", dpi = 300)
+
+
+## Figure 4
+dist <- read.csv("results/prob1_aps_psid.csv", col.names = "d")
+dens <- count(dist, d)
+dens$freq <- dens$n/nrow(dist)
+
+p <- ggplot(dens, aes(x=d, y=freq))+ 
+  geom_bar(stat="identity", colour="black", fill = "white") + 
+  theme_bw() + 
+  xlab("Optimal Decision") + 
+  ylab("Density") + 
+  scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
+
+ggsave(p, filename = "img/prob1_aps_psid.pdf", dpi = 300)
+
+
+dist <- read.csv("results/prob1_mc_psid.csv")
+dist$d <- 0:9
+
+p <- ggplot(dist, aes(x=d, y=psi_d)) + 
+  geom_bar(stat="identity", colour="black", fill = "white") +  
+  theme_bw() + 
+  xlab("Optimal Decision") + 
+  ylab("Expected Utility") + 
+  scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
+
+ggsave(p, filename = "img/prob1_mcmc_psid.pdf", dpi = 300)
+
+## Figure 6
+
+aps <- read.csv('./results/prob1_aps_pa_ara.csv', 
+                 col.names = c(0, 1),
+                 check.names = FALSE) %>% mutate(d = factor(0:9))
+
+mc <- read.csv('./results/prob1_mc_pa_ara.csv',  
+                 col.names = c(0, 1),
+                 check.names = FALSE) %>% mutate(d = factor(0:9))
+
+data <- bind_rows(APS = gather(aps, -d, key = "a", value = "pa"),
+                  MC  = gather( mc, -d, key = "a", value = "pa"),
+                  .id = "Algorithm")
+
+p <- ggplot(data, aes(x = d, fill = a, y = pa)) + 
+  geom_col(position = "dodge") + 
+  facet_wrap(vars(Algorithm))
+
+ggsave(p, filename = "img/prob1_pa_ara.pdf", dpi = 300, width = 14, height = 7)
