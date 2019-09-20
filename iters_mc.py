@@ -19,8 +19,9 @@ ITERS_TRUE_SOL = 1000000
 
 def optimal_number_iters(d_values, a_values, d_true, times=10, n_jobs=1):
 
-    iters_list = np.arange(1000, 10000000, 1000)
-    inner_iters_list = np.arange(100, 100000, 500)
+    inner_iters_list = np.arange(100, 10000, 100)
+    iters_list = np.arange(1000, 50000, 1000)
+    
 
     for inner, iters in product(inner_iters_list, iters_list):
 
@@ -34,6 +35,8 @@ def optimal_number_iters(d_values, a_values, d_true, times=10, n_jobs=1):
         )
 
         percent = np.mean( np.isclose( np.array(optimal_d), d_true ) )
+        print( "Outer iters: " + str(iters) + " Inner iters: " + str(inner) )
+        print("Percentage:", percent)
         ## Are 90% equal to the truth? Then we converge.
         if percent >= PER_TIMES:
             break
@@ -56,8 +59,9 @@ if __name__ == '__main__':
         a_values = np.arange(0, 1, disc)
         d_values = np.arange(0, 1, disc)
 
-        d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
-                          p.prob, iters=ITERS_TRUE_SOL, info=False)
+        #d_true = mcmc_adg(d_values, a_values, p.d_util, p.a_util, p.prob,
+        #                  p.prob, iters=ITERS_TRUE_SOL, info=False)
+        d_true = 0.46
 
         iters, inner = optimal_number_iters(d_values, a_values, d_true,
                                             n_jobs=N_JOBS, times=TIMES)
