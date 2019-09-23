@@ -11,7 +11,7 @@ p <- ggplot(dist, aes(x = pert_dec)) +
   xlab("Optimal Decision") + 
   ylab("Density")
 
-ggsave(p, filename = "img/SA.pdf", dpi = 300)
+ggsave(p, filename = "img/sa.pdf", dpi = 300)
 
 
 ## APS solution real problem
