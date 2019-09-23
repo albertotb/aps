@@ -12,7 +12,7 @@ data_n <- data %>%
   summarize(Density = n()/nrow(.))
 
 p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
-  geom_col(position = "dodge") + theme_bw()
+  geom_col(position = "dodge", color="black")
 
 ggsave(p, filename = "img/prob1_aps_psia.pdf", dpi = 300)
 
@@ -27,7 +27,7 @@ data_n <- data %>%
   mutate(a = factor(a))
   
 p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
-  geom_col(position = "dodge") + theme_bw()
+  geom_col(position = "dodge", color="black")
 
 ggsave(p, filename = "img/prob1_mc_psia.pdf", dpi = 300)
 
@@ -39,7 +39,6 @@ dens$freq <- dens$n/nrow(dist)
 
 p <- ggplot(dens, aes(x=d, y=freq))+ 
   geom_bar(stat="identity", colour="black", fill = "white") + 
-  theme_bw() + 
   xlab("Optimal Decision") + 
   ylab("Density") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
@@ -52,7 +51,6 @@ dist$d <- 0:9
 
 p <- ggplot(dist, aes(x=d, y=psi_d)) + 
   geom_bar(stat="identity", colour="black", fill = "white") +  
-  theme_bw() + 
   xlab("Optimal Decision") + 
   ylab("Expected Utility") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
@@ -77,9 +75,8 @@ data_n <- aps %>%
   mutate(a = factor(a))
 
 p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
-  geom_col(position = "dodge") + theme_bw()
-
-ggsave(p, filename = "img/prob1_pa_ara_aps.pdf", dpi = 300, width = 14, height = 7)
+  geom_col(position = "dodge", color="black")
+ggsave(p, filename = "img/prob1_pa_ara_aps.pdf", dpi = 300)
 
 data_n <- mc %>%
   mutate(d = factor(0:9)) %>%
@@ -87,9 +84,9 @@ data_n <- mc %>%
   mutate(a = factor(a))
 
 p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
-  geom_col(position = "dodge") + theme_bw()
+  geom_col(position = "dodge", color="black")
 
-ggsave(p, filename = "img/prob1_pa_ara_mc.pdf", dpi = 300, width = 14, height = 7)
+ggsave(p, filename = "img/prob1_pa_ara_mc.pdf", dpi = 300)
 
 ############################## JOIN PLOTS######################################################
 ###################################################################################################
@@ -99,10 +96,10 @@ data <- bind_rows(APS = gather(aps, -d, key = "a", value = "pa"),
                   .id = "Algorithm")
 
 p <- ggplot(data, aes(x = d, fill = a, y = pa)) + 
-  geom_col(position = "dodge") + 
-  facet_wrap(vars(Algorithm)) + theme_bw() 
+  geom_col(position = "dodge", color="black") + 
+  facet_wrap(vars(Algorithm)) 
 
-ggsave(p, filename = "img/prob1_pa_ara.pdf", dpi = 300, width = 14, height = 7)
+#   ggsave(p, filename = "img/prob1_pa_ara.pdf", dpi = 300, width = 14, height = 7)
 
 
 ## Figure 7
@@ -111,8 +108,7 @@ dens <- count(dist, d)
 dens$freq <- dens$n/nrow(dist)
 
 p <- ggplot(dens, aes(x=d, y=freq))+ 
-  geom_bar(stat="identity", colour="black", fill = "white") + 
-  theme_bw() + 
+  geom_bar(stat="identity", colour="black", fill = "white") +
   xlab("Optimal Decision") + 
   ylab("Density") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
@@ -125,7 +121,6 @@ dist$d <- 0:9
 
 p <- ggplot(dist, aes(x=d, y=psi_d)) + 
   geom_bar(stat="identity", colour="black", fill = "white") +  
-  theme_bw() + 
   xlab("Optimal Decision") + 
   ylab("Expected Utility") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
