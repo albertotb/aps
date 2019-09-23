@@ -14,7 +14,7 @@ data_n <- data %>%
 p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
   geom_col(position = "dodge", color="black")
 
-ggsave(p, filename = "img/prob1_aps_psia.pdf", dpi = 300)
+ggsave(p, filename = "img/prob1_aps_psia.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 
 data <- read.csv("results/prob1_mc_psia.csv", 
@@ -29,7 +29,7 @@ data_n <- data %>%
 p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
   geom_col(position = "dodge", color="black")
 
-ggsave(p, filename = "img/prob1_mc_psia.pdf", dpi = 300)
+ggsave(p, filename = "img/prob1_mc_psia.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 
 ## Figure 4
@@ -43,7 +43,7 @@ p <- ggplot(dens, aes(x=d, y=freq))+
   ylab("Density") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
 
-ggsave(p, filename = "img/prob1_aps_psid.pdf", dpi = 300)
+ggsave(p, filename = "img/prob1_aps_psid.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 
 dist <- read.csv("results/prob1_mc_psid.csv")
@@ -55,7 +55,7 @@ p <- ggplot(dist, aes(x=d, y=psi_d)) +
   ylab("Expected Utility") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
 
-ggsave(p, filename = "img/prob1_mcmc_psid.pdf", dpi = 300)
+ggsave(p, filename = "img/prob1_mcmc_psid.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 ## Figure 6
 
@@ -76,7 +76,7 @@ data_n <- aps %>%
 
 p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
   geom_col(position = "dodge", color="black")
-ggsave(p, filename = "img/prob1_pa_ara_aps.pdf", dpi = 300)
+ggsave(p, filename = "img/prob1_pa_ara_aps.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 data_n <- mc %>%
   mutate(d = factor(0:9)) %>%
@@ -86,7 +86,7 @@ data_n <- mc %>%
 p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
   geom_col(position = "dodge", color="black")
 
-ggsave(p, filename = "img/prob1_pa_ara_mc.pdf", dpi = 300)
+ggsave(p, filename = "img/prob1_pa_ara_mc.pdf", dpi = 300,width = 8.33, height = 5.79)
 
 ############################## JOIN PLOTS######################################################
 ###################################################################################################
@@ -113,7 +113,7 @@ p <- ggplot(dens, aes(x=d, y=freq))+
   ylab("Density") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
 
-ggsave(p, filename = "img/prob1_aps_psid_ara.pdf", dpi = 300)
+ggsave(p, filename = "img/prob1_aps_psid_ara.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 
 dist <- read.csv("results/prob1_mc_psid_ara.csv")
@@ -125,4 +125,4 @@ p <- ggplot(dist, aes(x=d, y=psi_d)) +
   ylab("Expected Utility") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
 
-ggsave(p, filename = "img/prob1_mc_psid_ara.pdf", dpi = 300)
+ggsave(p, filename = "img/prob1_mc_psid_ara.pdf", dpi = 300, width = 8.33, height = 5.79)
