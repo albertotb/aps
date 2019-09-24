@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import bernoulli, uniform, beta
 
-data = pd.read_csv('./data/prob1', header=0, delim_whitespace=True)
+data = pd.read_csv('prob1', header=0, delim_whitespace=True)
 
 data = data.sort_values(by = ['d','a','theta'])
 
