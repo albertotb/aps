@@ -7,8 +7,6 @@ import math
 from scipy.stats import mode
 from timeit import default_timer
 import sys
-sys.path.append('.')
-from prob_new import *
 
 ### Proposal Distribution
 def propose_att(current):
@@ -21,7 +19,7 @@ def propose(current):
 def propose_init(current):
     prop = current + np.random.normal(0,0.1)
     return prop
-    
+
 
 ############################################################################
 ### Inner APS ##############################################################

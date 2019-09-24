@@ -3,12 +3,10 @@ import sys
 import numpy as np
 import pandas as pd
 import pickle as pkl
-from prob_new import *
 from aps_annealing import aps_adg_ann
 from mcmc import mcmc_adg
 from timeit import repeat
-
-sys.path.append('.')
+from data.prob_new import *
 
 if __name__ == '__main__':
 
@@ -26,7 +24,7 @@ if __name__ == '__main__':
         outer_iters = int(sys.argv[2])
         inner_iters = int(sys.argv[3])
         fstr = f'''mcmc_adg(d_values, a_values, d_util, a_util, prob, prob,
-                            iters={outer_iters}, inner_iters={inner_iters}, 
+                            iters={outer_iters}, inner_iters={inner_iters},
                             info=True)'''
 
     elif len(sys.argv) == 6:

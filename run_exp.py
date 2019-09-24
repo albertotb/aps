@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    p = import_module(args.module)
+    p = import_module(f'data.{args.module}')
 
     #np.random.seed(1234)
 

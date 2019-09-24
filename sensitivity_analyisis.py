@@ -7,14 +7,14 @@ import pandas as pd
 import numpy as np
 ##
 from scipy.stats import uniform, beta, bernoulli
-import prob1 as p
+import data.prob1 as p
 from mcmc import mcmc_adg, mcmc_ara
 import matplotlib.pyplot as plt
 
 # ## Parameters
 
 K = 10000 ## Number of perturbations
-iters=10000 ## Number of iterations for MC approximation
+iters = 10000 ## Number of iterations for MC approximation
 save = True ## Wether to save or not the solution
 # ## Perturbations
 
