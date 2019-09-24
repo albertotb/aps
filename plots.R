@@ -1,5 +1,115 @@
 library(ggplot2)
-library(reshape2)
+library(tidyr)
+library(stringr)
+library(dplyr)
+
+## Figure 3
+data <- read.csv("results/prob1_aps_psia.csv", col.names = 0:9, check.names = FALSE)
+data_n <- data %>% 
+  gather(key = "d", value = "a", convert = TRUE) %>%
+  mutate(d = factor(d), a = factor(a)) %>%
+  group_by(d, a) %>%
+  summarize(Density = n()/nrow(.))
+
+p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
+  geom_col(position = "dodge", color="black")
+
+ggsave(p, filename = "img/prob1_aps_psia.pdf", dpi = 300, width = 8.33, height = 5.79)
+
+data <- read.csv("results/prob1_mc_psia.csv", 
+                 col.names = c(0, 1), 
+                 check.names = FALSE)
+
+data_n <- data %>%
+  mutate(d = factor(0:9)) %>%
+  gather(-d, key = "a", value = "Density", convert = TRUE) %>%
+  mutate(a = factor(a))
+
+p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
+  geom_col(position = "dodge", color="black")
+
+ggsave(p, filename = "img/prob1_mc_psia.pdf", dpi = 300, width = 8.33, height = 5.79)
+
+
+## Figure 4
+dist <- read.csv("results/prob1_aps_psid.csv", col.names = "d")
+dens <- count(dist, d)
+dens$freq <- dens$n/nrow(dist)
+
+p <- ggplot(dens, aes(x=d, y=freq))+ 
+  geom_bar(stat="identity", colour="black", fill = "white") + 
+  xlab("Optimal Decision") + 
+  ylab("Density") + 
+  scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
+
+ggsave(p, filename = "img/prob1_aps_psid.pdf", dpi = 300, width = 8.33, height = 5.79)
+
+dist <- read.csv("results/prob1_mc_psid.csv")
+dist$d <- 0:9
+
+p <- ggplot(dist, aes(x=d, y=psi_d)) + 
+  geom_bar(stat="identity", colour="black", fill = "white") +  
+  xlab("Optimal Decision") + 
+  ylab("Expected Utility") + 
+  scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
+
+ggsave(p, filename = "img/prob1_mcmc_psid.pdf", dpi = 300, width = 8.33, height = 5.79)
+
+
+## Figure 6
+aps <- read.csv('./results/prob1_aps_pa_ara.csv', 
+                col.names = c(0, 1),
+                check.names = FALSE) %>% mutate(d = factor(0:9))
+
+mc <- read.csv('./results/prob1_mc_pa_ara.csv',  
+               col.names = c(0, 1),
+               check.names = FALSE) %>% mutate(d = factor(0:9))
+
+############################## SEPARATE PLOTS########
+data_n <- aps %>%
+  mutate(d = factor(0:9)) %>%
+  gather(-d, key = "a", value = "Density", convert = TRUE) %>%
+  mutate(a = factor(a))
+
+p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
+  geom_col(position = "dodge", color="black")
+ggsave(p, filename = "img/prob1_pa_ara_aps.pdf", dpi = 300, width = 8.33, height = 5.79)
+
+data_n <- mc %>%
+  mutate(d = factor(0:9)) %>%
+  gather(-d, key = "a", value = "Density", convert = TRUE) %>%
+  mutate(a = factor(a))
+
+p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
+  geom_col(position = "dodge", color="black")
+
+ggsave(p, filename = "img/prob1_pa_ara_mc.pdf", dpi = 300, width = 8.33, height = 5.79)
+
+
+## Figure 7
+dist <- read.csv("results/prob1_aps_psid_ara.csv", col.names = "d")
+dens <- count(dist, d)
+dens$freq <- dens$n/nrow(dist)
+
+p <- ggplot(dens, aes(x=d, y=freq))+ 
+  geom_bar(stat="identity", colour="black", fill = "white") +
+  xlab("Optimal Decision") + 
+  ylab("Density") + 
+  scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
+
+ggsave(p, filename = "img/prob1_aps_psid_ara.pdf", dpi = 300, width = 8.33, height = 5.79)
+
+dist <- read.csv("results/prob1_mc_psid_ara.csv")
+dist$d <- 0:9
+
+p <- ggplot(dist, aes(x=d, y=psi_d)) + 
+  geom_bar(stat="identity", colour="black", fill = "white") +  
+  xlab("Optimal Decision") + 
+  ylab("Expected Utility") + 
+  scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
+
+ggsave(p, filename = "img/prob1_mc_psid_ara.pdf", dpi = 300, width = 8.33, height = 5.79)
+
 
 ## Sensitivity Analysis
 dist = read.csv("results/sa_results.csv")
@@ -26,6 +136,7 @@ p
 
 ggsave(p, filename = "img/aps_prob3.pdf", device = "pdf", dpi = 300, width = 8.33, height = 5.79)
 
+
 ## Expected utility time comparison problem
 psi_d <- read.csv("results/EU_timecompprob.csv")
 
@@ -35,6 +146,7 @@ p <- ggplot(psi_d, aes(x = d, y = EU)) +
   ylab("Defender's Expected Utility")
 
 ggsave(p, filename = "img/EU_probtime.pdf", device = "pdf", dpi = 300, width = 8.33, height = 5.79)
+
 
 ## Cost interpolation
 costs <- read.csv("results/costs.csv")
@@ -47,14 +159,15 @@ p <- ggplot(costs, aes(x = x, y = y)) +
 
 ggsave(p, filename = "img/costs.pdf", device = "pdf", dpi = 300, width = 8.33, height = 5.79)
 
-## p_d real problem
-pd <- read.csv("results/p_d.csv")
-colnames(pd) <- c("d", 0:30)
-pd_melted <- melt(pd, id.vars = "d")
-ds <- c(0, 50, 100, 195)
-pd_melted <- pd_melted[pd_melted$d %in% ds,]
 
-p <- ggplot(data = pd_melted, aes(x = variable, y = value)) + 
+## p_d real problem
+pd <- read.csv("results/p_d.csv", col.names = c("d", 0:30), check.names = FALSE)
+
+pd_melted <- pd %>%
+  gather(-d, key = "variable", value = "value", convert = TRUE) %>%
+  filter(d %in% c(0, 50, 100, 195))
+
+p <- ggplot(data = pd_melted, aes(x = factor(variable), y = value)) + 
   geom_bar(stat = "identity", colour="black", fill = "white") + 
   scale_x_discrete(breaks = seq(0, 30, 2)) + 
   facet_wrap(~ d, nrow = 2) + 
