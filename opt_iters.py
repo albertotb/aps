@@ -36,11 +36,19 @@ def optimal_number_iters(alg, d_values, a_values, d_true, disc, times=10,
                       .sort_values(by=['iters', 'inner_iters']))
 
     elif alg == 'aps':
-        params = {'J_inner': [10, 20, 50, 100],
-                  'J':       arange1(10, 100, 10) * int(1/disc),
-                  'N_inner': [10, 20, 50, 100],
-                  'N_aps':   arange1(1, 10, 1) * int(1/disc)}
+        # both
+        #params = {'J_inner': [10, 20, 50, 100],
+        #          'J':       arange1(10, 100, 10) * int(1/disc),
+        #          'N_inner': [10, 20, 50, 100],
+        #          'N_aps':   arange1(1, 10, 1) * int(1/disc)}
 
+        # precision 0.01
+        #params = {'J_inner': [10, 50, 100],
+        #          'J':       np.arange(1000, 11000, 1000),
+        #          'N_inner': [10, 50, 100],
+        #          'N_aps':   np.arange(100, 1100, 100)}
+
+        # precision 0.1
         params = {'J_inner': [1, 5, 10, 20, 50, 100],
                   'J':       np.arange(1, 1100, 5),
                   'N_inner': [5, 10, 50, 100],
