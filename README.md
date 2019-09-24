@@ -6,15 +6,18 @@ The folder structure is the following:
 
   * `notebook/`, Jupyter notebooks with analysis
   * `results/`, output files
-  * `data1`, problem1 data file
+  * `data/`, problem data files
+  * `img/`, figures
   * `aps.py`, implementation of the APS algorithm
+  * `aps_annealing.py`, implementation of the APS annealing strategy
   * `mcmc.py`, implementation of the MCMC algorithm
-  * `prob1.py`, information specific to example 1
-  * `prob2.py`, information specific to example 2
-  * `prob1_sa.py`, sensitivity analysis for prob1 ADG
+  * `opt_iters.py`, script to compute optimal number of iterations
+  * `plot.R`, script to generate all the plots
+  * `sensitivity_analysis.py`, script to perform sensitivity analysis of problem 1
+  * `true_sol.py`, script to compute the true solution of a problem
   * `run_exp.py`, interface to run the experiments
-  * `run_exp.sh`, wrapper to run the experiments in a SGE cluster
-  * `run_all.sh`, helper script to run all experiments in a SGE cluster
+  * `run_sge.sh`, wrapper to run the experiments in a SGE cluster
+  * `run_all.sh`, helper script to run all experiments
   
  Run the experiments in `lovelace` using MCMC: 
  
