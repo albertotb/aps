@@ -40,11 +40,8 @@ d_cost = np.array([0, 2400, 3600, 4800, 12000])
 
 
 cs = log_interp1d(d_values, d_cost)
-#cs = lambda d: d_cost[d_values == d]
 
-#d_values = np.array([0, 2, 5, 10, 50, 100, 200, 250, 300, 350, 400, 450,  500, 750, 1000])
-
-d_values = np.arange(100, 200, 5)
+d_values = np.arange(0, 200, 5)
 
 def pl(a, d, a_g, scale_g, a_l, scale_l, size=1):
     return (np.where(gamma.rvs(a=a_g, scale=scale_g, size=a*size) - d > 0,
@@ -53,11 +50,13 @@ def pl(a, d, a_g, scale_g, a_l, scale_l, size=1):
               .sum(axis=1))
 
 def pm(l, alpha, beta):
-    return np.minimum(1.5e6, 3e6*l*unif(alpha, beta))
+    #return np.minimum(1.5e6, 3e6*l*unif(alpha, beta))
+    return 3e6*l*(alpha+beta)/2
 
 def ct(a, p):
     t = binom.rvs(a, p=p) > 0
-    return norm.rvs(2430000, 400000) * t
+    #return norm.rvs(2430000, 400000) * t
+    return 2430000 * t
 
 cd = lambda d, l, alpha, beta: cs(d) + pm(l, alpha=alpha, beta=beta)
 ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/CD_MAX) - 1)

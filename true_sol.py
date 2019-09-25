@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import data.prob_new as p
+import data.prob3 as p
 from mcmc import *
 from joblib import Parallel, delayed
 

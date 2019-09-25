@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import pickle
-import prob_new as p
+import data.prob3 as p
 from aps_annealing import *
 from mcmc import *
 from joblib import Parallel, delayed

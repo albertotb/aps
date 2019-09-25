@@ -6,7 +6,7 @@ import pickle as pkl
 from aps_annealing import aps_adg_ann
 from mcmc import mcmc_adg
 from timeit import repeat
-from data.prob_new import *
+from data.prob3 import *
 
 if __name__ == '__main__':
 
