@@ -49,7 +49,7 @@ if __name__ == '__main__':
     parser.add_argument('-o',
                 dest='out',
                 help='output dir',
-                default='.')
+                default='./results')
 
     parser.add_argument('--njobs',
                 type=int,
