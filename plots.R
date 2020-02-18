@@ -4,6 +4,7 @@ library(ggplot2)
 library(tidyr)
 library(stringr)
 library(dplyr)
+library(latex2exp)
 
 ## Figure 3
 data <- read.csv("results/prob1_aps_psia.csv", col.names = 0:9, check.names = FALSE)
@@ -11,9 +12,9 @@ data_n <- data %>%
   gather(key = "d", value = "a", convert = TRUE) %>%
   mutate(d = factor(d), a = factor(a)) %>%
   group_by(d, a) %>%
-  summarize(Density = n()/nrow(.))
+  summarize(Frequency = n()/nrow(data)) ## Watch out! This is nrow(data)
 
-p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
+p <- ggplot(data_n, aes(x = d, y = Frequency, fill = a)) + 
   geom_col(position = "dodge", color="black")
 
 ggsave(p, filename = "img/prob1_aps_psia.pdf", dpi = 300, width = 8.33, height = 5.79)
@@ -24,11 +25,13 @@ data <- read.csv("results/prob1_mc_psia.csv",
 
 data_n <- data %>%
   mutate(d = factor(0:9)) %>%
-  gather(-d, key = "a", value = "Density", convert = TRUE) %>%
+  gather(-d, key = "a", value = "Expected_Utility", convert = TRUE) %>%
   mutate(a = factor(a))
 
-p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
+p <- ggplot(data_n, aes(x = d, y = Expected_Utility, fill = a)) + 
   geom_col(position = "dodge", color="black")
+
+p = p + ylab("Expected Utility")
 
 ggsave(p, filename = "img/prob1_mc_psia.pdf", dpi = 300, width = 8.33, height = 5.79)
 
@@ -41,7 +44,7 @@ dens$freq <- dens$n/nrow(dist)
 p <- ggplot(dens, aes(x=d, y=freq))+ 
   geom_bar(stat="identity", colour="black", fill = "white") + 
   xlab("Optimal Decision") + 
-  ylab("Density") + 
+  ylab("Frequency") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
 
 ggsave(p, filename = "img/prob1_aps_psid.pdf", dpi = 300, width = 8.33, height = 5.79)
@@ -70,20 +73,21 @@ mc <- read.csv('./results/prob1_mc_pa_ara.csv',
 ############################## SEPARATE PLOTS########
 data_n <- aps %>%
   mutate(d = factor(0:9)) %>%
-  gather(-d, key = "a", value = "Density", convert = TRUE) %>%
+  gather(-d, key = "a", value = "Frequency", convert = TRUE) %>%
   mutate(a = factor(a))
 
-p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
-  geom_col(position = "dodge", color="black")
+exp = TeX("p_D(a|d)")
+p <- ggplot(data_n, aes(x = d, y = Frequency, fill = a)) + 
+  geom_col(position = "dodge", color="black") + ylab(exp) 
 ggsave(p, filename = "img/prob1_pa_ara_aps.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 data_n <- mc %>%
   mutate(d = factor(0:9)) %>%
-  gather(-d, key = "a", value = "Density", convert = TRUE) %>%
+  gather(-d, key = "a", value = "Expected_Utility", convert = TRUE) %>%
   mutate(a = factor(a))
 
-p <- ggplot(data_n, aes(x = d, y = Density, fill = a)) + 
-  geom_col(position = "dodge", color="black")
+p <- ggplot(data_n, aes(x = d, y = Expected_Utility, fill = a)) + 
+  geom_col(position = "dodge", color="black") + ylab(exp) 
 
 ggsave(p, filename = "img/prob1_pa_ara_mc.pdf", dpi = 300, width = 8.33, height = 5.79)
 
@@ -96,7 +100,7 @@ dens$freq <- dens$n/nrow(dist)
 p <- ggplot(dens, aes(x=d, y=freq))+ 
   geom_bar(stat="identity", colour="black", fill = "white") +
   xlab("Optimal Decision") + 
-  ylab("Density") + 
+  ylab("Frequency") + 
   scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0))
 
 ggsave(p, filename = "img/prob1_aps_psid_ara.pdf", dpi = 300, width = 8.33, height = 5.79)
