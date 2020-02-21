@@ -35,13 +35,20 @@ def log_interp1d(xx, yy, kind='linear'):
 unif = lambda a, b, size=1: uniform.rvs(a, b-a, size=size)
 
 a_values = np.arange(31)
-d_values = np.array([0, 2, 5, 10, 1000])
-d_cost = np.array([0, 2400, 3600, 4800, 12000])
-
-
-cs = log_interp1d(d_values, d_cost)
-
 d_values = np.arange(0, 200, 5)
+#d_values = np.array([0, 2, 5, 10, 1000])
+#d_cost = np.array([0, 2400, 3600, 4800, 12000])
+#cs = log_interp1d(d_values, d_cost)
+cs = np.array([   0.        , 3600.        , 4800.        , 5203.29101153,
+       5509.81702845, 5759.95860937, 5972.74612902, 6158.77670632,
+       6324.60076812, 6474.57005153, 6611.73292272, 6738.31337977,
+       6855.98715173, 6966.05038682, 7069.5276606 , 7167.24385155,
+       7259.87354382, 7347.97593087, 7432.02006704, 7512.40351745,
+       7589.4663844 , 7663.50202754, 7734.7653756 , 7803.47945443,
+       7869.84057405, 7934.02249396, 7996.17980049, 8056.45066924,
+       8114.95914322, 8171.81702549, 8227.12546256, 8280.97627751,
+       8333.45309919, 8384.63232399, 8434.58393927, 8483.37223183,
+       8531.05640024, 8577.69108634, 8623.32683855, 8668.01051718])
 
 def pl(a, d, a_g, scale_g, a_l, scale_l, size=1):
     return (np.where(gamma.rvs(a=a_g, scale=scale_g, size=a*size) - d > 0,
@@ -58,7 +65,11 @@ def ct(a, p):
     #return norm.rvs(2430000, 400000) * t
     return 2430000 * t
 
-cd = lambda d, l, alpha, beta: cs(d) + pm(l, alpha=alpha, beta=beta)
+def cd(d, l, alpha, beta):
+    A = cs[np.where(d_values == d)[0][0]]
+    B = pm(l, alpha=alpha, beta=beta)
+    return A+B
+
 ud = lambda cd: (1/(math.e-1))*(np.exp(1 - cd/CD_MAX) - 1)
 
 ca = lambda a, l, p, alpha, beta: pm(l, alpha=alpha, beta=beta)-ct(a, p=p)-792*a
@@ -89,7 +100,6 @@ def a_prob_f(d=None):
     return lambda d, a, size=1: pl(d, a, a_g, scale_g, a_l, scale_l, size=size)
 
 if __name__ == '__main__':
-
     # check all utils are positive
     res = np.zeros((len(a_values), len(d_values)))
     for i, a in enumerate(a_values):
