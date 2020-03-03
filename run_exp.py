@@ -126,10 +126,12 @@ if __name__ == '__main__':
             print('-' * 80)
             print('Iters: {}'.format(args.mcmc))
             with timer():
-                d_opt, a_opt, psi_d, psi_a, t = mcmc_adg(p.d_values, p.a_values,
-                                                         p.d_util, p.a_util,
-                                                         p.prob, p.prob,
-                                                         mcmc_iters=args.mcmc)
+                (d_opt, a_opt,
+                 psi_d, psi_d_std,
+                 psi_a, psi_a_std, t) = mcmc_adg(p.d_values, p.a_values,
+                                                 p.d_util, p.a_util,
+                                                 p.prob, p.prob,
+                                                 iters=args.mcmc)
                 # print('Elapsed time per attack: ', t)
 
             psi_d = pd.Series(psi_d, index=d_idx)
@@ -193,12 +195,13 @@ if __name__ == '__main__':
             print('-' * 80)
             print('Iters: {}'.format(args.mcmc))
             with timer():
-                d_opt, p_a, psi_da, psi_ad = mcmc_ara(p.d_values, p.a_values,
-                                                      p.d_util, p.a_util_f, p.prob,
-                                                      p.a_prob_f,
-                                                      mcmc_iters=args.mcmc,
-                                                      ara_iters=args.ara,
-                                                      n_jobs=args.njobs)
+                (d_opt, p_a, 
+                 psi_da, psi_da_std,
+                 psi_ad, psi_ad_std) = mcmc_ara(p.d_values, p.a_values,
+                                                p.d_util, p.a_util_f, p.prob,
+                                                p.a_prob_f, iters=args.mcmc,
+                                                ara_iters=args.ara,
+                                                n_jobs=args.njobs)
 
         elif args.alg == 'aps':
             print('APS')
