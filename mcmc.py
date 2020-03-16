@@ -59,7 +59,7 @@ def mcmc_adg(d_values, a_values, d_util, a_util, d_prob, a_prob,
         end = default_timer()
         theta_d = d_prob(d, a_opt[i], size=iters)
         psi_d[i] = d_util(d, theta_d).mean()
-        psi_d_std[i] = d_util(d, theta_d).std() / sqrt(inner_iters)
+        psi_d_std[i] = d_util(d, theta_d).std() / sqrt(iters)
         times[i] = end - start
 
     d_opt = d_values[psi_d.argmax()]
