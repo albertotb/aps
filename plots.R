@@ -16,7 +16,8 @@ data_n <- data %>%
 
 p <- ggplot(data_n, aes(x = d, y = Frequency, fill = a)) + 
   geom_col(position = "dodge", color="black")
-
+p <- p + scale_fill_manual(values=c("black", "white"))
+p
 ggsave(p, filename = "img/prob1_aps_psia.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 data <- read.csv("results/prob1_mc_psia.csv", 
@@ -30,7 +31,7 @@ data_n <- data %>%
 
 p <- ggplot(data_n, aes(x = d, y = Expected_Utility, fill = a)) + 
   geom_col(position = "dodge", color="black")
-
+p <- p + scale_fill_manual(values=c("black", "white"))
 p = p + ylab("Expected Utility")
 
 ggsave(p, filename = "img/prob1_mc_psia.pdf", dpi = 300, width = 8.33, height = 5.79)
@@ -79,6 +80,9 @@ data_n <- aps %>%
 exp = TeX("p_D(a|d)")
 p <- ggplot(data_n, aes(x = d, y = Frequency, fill = a)) + 
   geom_col(position = "dodge", color="black") + ylab(exp) 
+
+p <- p + scale_fill_manual(values=c("black", "white"))
+p
 ggsave(p, filename = "img/prob1_pa_ara_aps.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 data_n <- mc %>%
@@ -88,7 +92,8 @@ data_n <- mc %>%
 
 p <- ggplot(data_n, aes(x = d, y = Expected_Utility, fill = a)) + 
   geom_col(position = "dodge", color="black") + ylab(exp) 
-
+p <- p + scale_fill_manual(values=c("black", "white"))
+p
 ggsave(p, filename = "img/prob1_pa_ara_mc.pdf", dpi = 300, width = 8.33, height = 5.79)
 
 
