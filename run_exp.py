@@ -4,6 +4,8 @@ import pickle
 import argparse
 import numpy as np
 import pandas as pd
+import time
+from itertools import product
 from timeit import default_timer
 from importlib import import_module
 from contextlib import contextmanager
@@ -112,6 +114,9 @@ if __name__ == '__main__':
 
     d_idx = pd.Index(p.d_values, name='d')
     a_idx = pd.Index(p.a_values, name='a')
+    cols = map(lambda x: f'{x[0]}_{x[1]}', product(['mean', 'std'], a_idx))
+    ts_sec = int(time.time())
+    basepath = f'{args.out}/{ts_sec}_{args.module}_{args.alg}_{args.set}'
 
     #---------------------------------------------------------------------------
     # Attacker-defender game
@@ -132,10 +137,12 @@ if __name__ == '__main__':
                                                  p.d_util, p.a_util,
                                                  p.prob, p.prob,
                                                  iters=args.mcmc)
-                # print('Elapsed time per attack: ', t)
 
-            psi_d = pd.Series(psi_d, index=d_idx)
-            psi_a = pd.DataFrame(psi_a, index=d_idx, columns=a_idx)
+            psi_d = pd.DataFrame({'mean': psi_d, 'std': psi_d_std}, index=d_idx)
+            psi_a = pd.DataFrame(np.concatenate((psi_a, psi_a_std), axis=1),
+                                 index=d_idx, columns=cols)
+            psi_d.to_csv(f'{basepath}_psid.csv')
+            psi_a.to_csv(f'{basepath}_psia.csv')
 
         elif args.alg == 'aps':
             print('APS')
@@ -195,13 +202,24 @@ if __name__ == '__main__':
             print('-' * 80)
             print('Iters: {}'.format(args.mcmc))
             with timer():
-                (d_opt, p_a, 
+                (d_opt, p_a,
                  psi_da, psi_da_std,
                  psi_ad, psi_ad_std) = mcmc_ara(p.d_values, p.a_values,
                                                 p.d_util, p.a_util_f, p.prob,
                                                 p.a_prob_f, iters=args.mcmc,
                                                 ara_iters=args.ara,
                                                 n_jobs=args.njobs)
+
+                psi_d = pd.DataFrame({'mean': psi_da.sum(axis=1),
+                                      'std': psi_da_std.sum(axis=1)},
+                                     index=d_idx)
+                #psi_a = pd.DataFrame(np.concatenate((
+                #    psi_ad.mean(axis=2),
+                #    psi_a_std.mean(axis=2)
+                #), axis=1), index=d_idx, columns=cols)
+                psi_d.to_csv(f'{basepath}_psid.csv')
+                #psi_a.to_csv(f'{basepath}_psia.csv')
+
 
         elif args.alg == 'aps':
             print('APS')
@@ -219,26 +237,15 @@ if __name__ == '__main__':
         else:
             print('Error')
 
-        #a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
-        #psi_d = pd.Series(psi_da.sum(axis=1), index=d_idx)
-        #psi_a = pd.DataFrame(psi_ad.mean(axis=2), index=d_idx, columns=a_idx)
+        a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
         p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
-        #dout = {'d_opt': d_opt, 'a_opt': a_opt, 'psi_d': psi_d, 'psi_a': psi_a,
-        #        'psi_da': psi_da, 'psi_ad': psi_ad, 'p_a': p_a}
         dout = {'d_opt': d_opt, 'psi_da': psi_da, 'p_a': p_a}
-        with pd.option_context('display.max_columns', len(p.a_values)):
-            print(p_a)
 
     else:
         print('Error')
         sys.exit(1)
 
     print("Optimal Defense:", d_opt)
-    #print(a_opt)
-    #print(psi_d)
-    with pd.option_context('display.max_columns', len(p.a_values)):
-        pass
-    #print(psi_a)
 
     fout = '{}/{}_{}_{}.pkl'.format(args.out, args.module, args.alg, args.set)
     with open(fout, "wb") as f:
