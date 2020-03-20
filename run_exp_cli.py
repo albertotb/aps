@@ -15,6 +15,7 @@ from mcmc import mcmc_adg, mcmc_ara
 from aps import aps_adg, aps_ara
 from aps_annealing import aps_adg_ann
 
+
 @contextmanager
 def timer():
     start = default_timer()
