@@ -71,6 +71,7 @@ def cli_mcmc_adg(iters: int = 100):
     typer.echo(a_opt)
     typer.echo(d_opt)
 
+
 @mcmc_app.command("ara")
 def cli_mcmc_ara(iters: int = 100, ara_iters: int = 10, n_jobs: int = 1):
 
