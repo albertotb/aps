@@ -13,8 +13,11 @@ d_values = data['d'].unique()
 a_values = data['a'].unique()
 theta_values = data['theta'].unique()
 
-alpha_values = data['alpha'].dropna().values
-beta_values = data['beta'].dropna().values
+#alpha_values = data['alpha'].dropna().values
+#beta_values = data['beta'].dropna().values
+
+alpha_values = data['alpha'].dropna().values / 100
+beta_values = data['beta'].dropna().values / 100
 
 # Important to set the index in this order and sort it before the reshape
 data = data.set_index(['d', 'a', 'theta'])
