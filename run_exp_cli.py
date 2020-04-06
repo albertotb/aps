@@ -73,6 +73,20 @@ def cli_mcmc_adg(iters: int = 100):
     typer.echo(d_opt)
 
 
+@aps_app.command("adg")
+def cli_aps_adg(iters: int = 10, inner_iters: int = 10, burnin: float = 0.75):
+
+    p = state['p']
+
+    with timer():
+        d_opt, a_opt, psi_d, psi_a = aps_adg(p.d_values, p.a_values, p.d_util,
+                                             p.a_util, p.prob, burnin=burnin,
+                                             N_aps=iters, N_inner=inner_iters)
+
+    pd.Series(psi_d).to_csv(f'{state["basepath"]}_aps_adg_psid.csv',
+                             header=False, index=False)
+
+
 @mcmc_app.command("ara")
 def cli_mcmc_ara(iters: int = 100, ara_iters: int = 10, n_jobs: int = 1):
 
@@ -99,19 +113,10 @@ def cli_mcmc_ara(iters: int = 100, ara_iters: int = 10, n_jobs: int = 1):
     a_opt = pd.Series(p_a.argmax(axis=1), index=state["d_idx"])
     p_a = pd.DataFrame(p_a, index=state["d_idx"], columns=state["a_idx"])
 
+    p_a.to_csv(f'{state["basepath"]}_mcmc_ara_pa.csv')
+
     typer.echo(a_opt)
     typer.echo(d_opt)
-
-
-@aps_app.command("adg")
-def cli_aps_adg(iters: int = 10, inner_iters: int = 10, burnin: float = 0.75):
-
-    p = state['p']
-
-    with timer():
-        d_opt, a_opt, psi_d, psi_a = aps_adg(p.d_values, p.a_values, p.d_util,
-                                             p.a_util, p.prob, burnin=burnin,
-                                             N_aps=iters, N_inner=inner_iters)
 
 
 @aps_app.command("ara")
@@ -122,6 +127,8 @@ def cli_aps_ara(iters: int = 10, inner_iters: int = 10, burnin: float = 0.75,
 
     if pa is not None:
         p_a = pd.read_pickle(pa).values
+    else:
+        p_a = None
 
     with timer():
         d_opt, p_a, psi_da = aps_ara(p.d_values, p.a_values, p.d_util,
@@ -129,6 +136,12 @@ def cli_aps_ara(iters: int = 10, inner_iters: int = 10, burnin: float = 0.75,
                                      N_aps=iters, J=ara_iters,
                                      burnin=burnin, p_d=p_a,
                                      N_inner=inner_iters)
+
+    pd.Series(psi_da).to_csv(f'{state["basepath"]}_aps_ara_psid.csv',
+                             header=False, index=False)
+
+    p_a = pd.DataFrame(p_a, index=state["d_idx"], columns=state["a_idx"])
+    p_a.to_csv(f'{state["basepath"]}_aps_ara_pa.csv')
 
 
 @ann_app.command("adg")
