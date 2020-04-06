@@ -67,8 +67,8 @@ ggsave(p4b, filename = "img/prob1_aps_psid.pdf", dpi = dpi, width = width, heigh
 #------------------------------------------------------------------------------
 
 # Data figure 6
-d6a <- read.csv('./results/prob1_mc_pa_ara.csv', col.names = c(0, 1), check.names = FALSE)
-d6b <- read.csv('./results/prob1_aps_pa_ara.csv', col.names = c(0, 1), check.names = FALSE)
+d6a <- read_csv('./results/1586188428_prob1_mcmc_ara_pa.csv')
+d6b <- read_csv('./results/1586188819_prob1_aps_ara_pa.csv')
 
 d6a_long <- d6a %>%
   mutate(d = factor(0:9)) %>%
@@ -100,7 +100,7 @@ ggsave(p6b, filename = "img/prob1_pa_ara_aps.pdf", dpi = dpi, width = width, hei
 # Data figure 7
 d7a <- read_csv("results/1584637784_prob1_mcmc_ara_psid.csv", col_types = c(d = "c"))
 
-dist <- read.csv("results/prob1_aps_psid_ara.csv", col.names = "d")
+dist <- read.csv("results/1586189360_prob1_aps_ara_psid.csv", col.names = "d")
 d7b <- count(dist, d)
 d7b$freq <- d7b$n/nrow(dist)
 
