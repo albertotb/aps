@@ -67,7 +67,11 @@ def prob_a(a, d, params, size=10):
 
 # Defender probability
 def prob_d(a, d,  size=1):
-    sample = pl(a, d, a_g=5, b_g=1, a_l=4, b_l=1, size=size)
+    sample = np.zeros([size, 2])
+    longitudes = pl(a, d, a_g=5, b_g=1, a_l=4, b_l=1, size=size)
+    m_shares   = pm(longitudes, alpha, beta)
+    sample[:,0] = longitudes
+    sample[:,1] = m_shares
     return sample
 
 
@@ -80,7 +84,7 @@ def ua(a, theta, params):
 
 # Defender's Utility
 def ud(d, theta):
-    cd = pm(theta, 0.0026, 0.00417) + cs[np.where(d_values == d)[0][0]]
+    cd = theta[:,1] + cs[np.where(d_values == d)[0][0]]
     return (1/(np.exp(1)-1))*(np.exp(1 - cd/CD_MAX) - 1)
 
 
