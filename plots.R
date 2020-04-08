@@ -190,3 +190,67 @@ p <- ggplot(data = pd_melted, aes(x = factor(variable), y = value)) +
   ylab("p(a|d)")
 
 ggsave(p, filename = "img/pa_given_d.pdf", dpi = dpi, width = width, height = height)
+
+#------------------------------------------------------------------------------
+
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+# APS solution real problem with Temperature
+J_grid = seq(500, 9500, by = 500)
+for(J in J_grid){
+  path <- paste0("results/dist_APS_J", as.character(J), '.csv')
+  path_out <- paste0("img/aps_prob3_J", as.character(J), '.pdf')
+  title <- paste('APS. Inverse Temperature', as.character(J))
+  dist <- read.csv(path, header = F)
+  mode = getmode(dist$V1)
+  p <- ggplot(dist, aes(x = V1,
+                        fill = factor(ifelse(V1 == mode, "Highlighted", "Normal")))) + 
+    geom_histogram(aes(y=(..count..)/sum(..count..)), bins = 41, colour="black") +
+    scale_fill_manual(name = "area", values=c("red", "white"), guide = FALSE) +
+    xlim(0,200) +
+    xlab("Defender's Decision") +
+    ylab("Frequency") + 
+    theme(plot.title = element_text(hjust = 0.5)) +
+    ggtitle(title)
+  p
+  
+  ggsave(p, filename = path_out, dpi = dpi, width = width, height = height)
+}
+
+path <- paste0("results/dist_APS_no_Jtrick.csv")
+path_out <- paste0('img/aps_prob3_no_Jtrick.pdf')
+title <- paste('APS')
+dist <- read.csv(path, header = F)
+mode = getmode(dist$V1)
+p <- ggplot(dist, aes(x = V1,
+                      fill = factor(ifelse(V1 == mode, "Highlighted", "Normal")))) + 
+  geom_histogram(aes(y=(..count..)/sum(..count..)), bins = 41, colour="black") +
+  scale_fill_manual(name = "area", values=c("red", "white"), guide = FALSE) +
+  xlim(0,200) +
+  xlab("Defender's Decision") +
+  ylab("Frequency") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle(title)
+
+p
+
+#------------------------------------------------------------------------------
+
+# p_d real problem
+pd <- read.csv("results/p_ad.csv", col.names = c("d", 0:30), check.names = FALSE)
+
+pd_melted <- pd %>%
+  gather(-d, key = "variable", value = "value", convert = TRUE) %>%
+  filter(d %in% c(0, 5, 10, 15))
+
+p <- ggplot(data = pd_melted, aes(x = factor(variable), y = value)) +
+  geom_bar(stat = "identity", colour="black", fill = "white") +
+  scale_x_discrete(breaks = seq(0, 30, 2)) +
+  facet_wrap(~ d, nrow = 2) +
+  xlab("Attacker's Decision") +
+  ylab("p(a|d)")
+
+ggsave(p, filename = "img/pa_given_d_new.pdf", dpi = dpi, width = width, height = height)
