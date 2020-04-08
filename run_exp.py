@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 import sys
 import pickle
-import argparse
 import numpy as np
 import pandas as pd
 import time
+import typer
 from itertools import product
 from timeit import default_timer
 from importlib import import_module
@@ -14,6 +14,7 @@ sys.path.append('.')
 from mcmc import mcmc_adg, mcmc_ara
 from aps import aps_adg, aps_ara
 from aps_annealing import aps_adg_ann
+
 
 @contextmanager
 def timer():
@@ -25,228 +26,136 @@ def timer():
         print("Elapsed time (s): {:.6f}".format(end - start))
 
 
-if __name__ == '__main__':
+app = typer.Typer()
+mcmc_app = typer.Typer()
+aps_app = typer.Typer()
+ann_app = typer.Typer()
+app.add_typer(mcmc_app, name="mcmc")
+app.add_typer(aps_app,  name="aps")
+app.add_typer(ann_app,  name="aps_ann")
 
-    parser = argparse.ArgumentParser(
-                formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+state = {}
 
-    parser.add_argument('-p',
-                dest='module',
-                help='module with problem specific information',
-                default='prob1',
-                choices=['prob1', 'prob2', 'prob3'])
 
-    parser.add_argument('-a',
-                dest='alg',
-                help='algorithm',
-                default='mcmc',
-                choices=['mcmc', 'aps', 'aps_annealing'])
+@app.callback()
+def global_args(prob: str = "prob1", out: str = "./results"):
 
-    parser.add_argument('-s',
-                dest='set',
-                help='setting',
-                default='adg',
-                choices=['adg', 'ara'])
-
-    parser.add_argument('-o',
-                dest='out',
-                help='output dir',
-                default='./results')
-
-    parser.add_argument('--njobs',
-                type=int,
-                dest='njobs',
-                help='Number of jobs',
-                default=1)
-
-    parser.add_argument('--mcmc',
-                type=int,
-                dest='mcmc',
-                help='Number of MCMC iterations',
-                default=100)
-
-    parser.add_argument('--ara',
-                type=int,
-                dest='ara',
-                help='Number of ARA iterations',
-                default=10)
-
-    parser.add_argument('--prob',
-                dest='prob',
-                help='Probability density p(a | d)',
-                default=None)
-
-    parser.add_argument('--aps',
-                type=int,
-                dest='aps',
-                help='Number of outer APS iterations',
-                default=100)
-
-    parser.add_argument('--aps_inner',
-                type=int,
-                dest='aps_inner',
-                help='Number of inner APS iterations',
-                default=10)
-
-    parser.add_argument('--burnin',
-                type=float,
-                dest='burnin',
-                help='Percentage of iterations to discard',
-                default=0.75)
-
-    parser.add_argument('--aps_temp',
-                type=int,
-                dest='aps_temp',
-                help='Temperature for outer and inner annealing aps',
-                default=1000)
-
-    parser.add_argument('--mean',
-                type=bool,
-                dest='aps_mean',
-                help='Boolean indicating wether to use the mean or not',
-                default=True)
-
-    args = parser.parse_args()
-
-    p = import_module(f'data.{args.module}')
-
-    #np.random.seed(1234)
-
-    d_idx = pd.Index(p.d_values, name='d')
-    a_idx = pd.Index(p.a_values, name='a')
-    cols = map(lambda x: f'{x[0]}_{x[1]}', product(['mean', 'std'], a_idx))
     ts_sec = int(time.time())
-    basepath = f'{args.out}/{ts_sec}_{args.module}_{args.alg}_{args.set}'
-
-    #---------------------------------------------------------------------------
-    # Attacker-defender game
-    #---------------------------------------------------------------------------
-    if args.set == 'adg':
-        print('=' * 30)
-        print('Game theory')
-        print('=' * 30)
-
-        if args.alg == 'mcmc':
-            print('MCMC')
-            print('-' * 80)
-            print('Iters: {}'.format(args.mcmc))
-            with timer():
-                (d_opt, a_opt,
-                 psi_d, psi_d_std,
-                 psi_a, psi_a_std, t) = mcmc_adg(p.d_values, p.a_values,
-                                                 p.d_util, p.a_util,
-                                                 p.prob, p.prob,
-                                                 iters=args.mcmc)
-
-            psi_d = pd.DataFrame({'mean': psi_d, 'std': psi_d_std}, index=d_idx)
-            psi_a = pd.DataFrame(np.concatenate((psi_a, psi_a_std), axis=1),
-                                 index=d_idx, columns=cols)
-            psi_d.to_csv(f'{basepath}_psid.csv')
-            psi_a.to_csv(f'{basepath}_psia.csv')
-
-        elif args.alg == 'aps':
-            print('APS')
-            print('-' * 80)
-            print('Outer iters: {}'.format(args.aps))
-            print('Inner iters: {}'.format(args.aps_inner))
-            print('Burnin: {}'.format(args.burnin))
-            with timer():
-                d_opt, a_opt, psi_d, psi_a = aps_adg(p.d_values, p.a_values,
-                                                     p.d_util, p.a_util,
-                                                     p.prob, N_aps=args.aps,
-                                                     burnin=args.burnin,
-                                                     N_inner=args.aps_inner)
-
-            psi_d = pd.Series(psi_d)
-            psi_a = pd.Series(psi_a, index=d_idx)
-
-        elif args.alg == 'aps_annealing':
-            print('APS ANNEALING')
-            print('-' * 80)
-            print('Outer iters: {}'.format(args.aps))
-            print('Inner iters: {}'.format(args.aps_inner))
-            print('Burnin: {}'.format(args.burnin))
-            print('Temperature: {}'.format(args.aps_temp))
-            with timer():
-                d_opt, psi_d = aps_adg_ann(p.d_util, p.a_util, p.prob,
-                                           J=args.aps_temp, J_inner=args.aps_temp,
-                                           N_aps=args.aps, burnin=args.burnin,
-                                           N_inner = args.aps_inner, prec=0.01,
-                                           mean=args.aps_mean, info=True)
-
-            psi_d = pd.Series(psi_d)
-
-        else:
-            print('Error')
-
-        #a_opt = pd.Series(a_opt, index=d_idx)
-        dout = {'d_opt': d_opt, 'psi_d': psi_d}
-    #---------------------------------------------------------------------------
-    # ARA
-    #---------------------------------------------------------------------------
-    elif args.set == 'ara':
-        print('=' * 30)
-        print('ARA')
-        print('=' * 30)
-
-        print('ARA iters: {}'.format(args.ara))
-
-        if args.prob:
-            p_a = pd.read_pickle('{}'.format(args.prob)).values
-            print(p_a)
-        else:
-            p_a = None
-
-        if args.alg == 'mcmc':
-            print('MCMC')
-            print('-' * 80)
-            print('Iters: {}'.format(args.mcmc))
-            with timer():
-                (d_opt, p_a,
-                 psi_da, psi_da_std,
-                 psi_ad, psi_ad_std) = mcmc_ara(p.d_values, p.a_values,
-                                                p.d_util, p.a_util_f, p.prob,
-                                                p.a_prob_f, iters=args.mcmc,
-                                                ara_iters=args.ara,
-                                                n_jobs=args.njobs)
-
-                psi_d = pd.DataFrame({'mean': psi_da.sum(axis=1),
-                                      'std': psi_da_std.sum(axis=1)},
-                                     index=d_idx)
-                #psi_a = pd.DataFrame(np.concatenate((
-                #    psi_ad.mean(axis=2),
-                #    psi_a_std.mean(axis=2)
-                #), axis=1), index=d_idx, columns=cols)
-                psi_d.to_csv(f'{basepath}_psid.csv')
-                #psi_a.to_csv(f'{basepath}_psia.csv')
+    state['p'] = import_module(f'data.{prob}')
+    state['d_idx'] = pd.Index(state['p'].d_values, name='d')
+    state['a_idx'] = pd.Index(state['p'].a_values, name='a')
+    state['cols'] = map(lambda x: f'{x[0]}_{x[1]}',
+                        product(['mean', 'std'], state['a_idx']))
+    state['basepath'] = f'{out}/{ts_sec}_{prob}'
 
 
-        elif args.alg == 'aps':
-            print('APS')
-            print('-' * 80)
-            print('Outer iters: {}'.format(args.aps))
-            print('Inner iters: {}'.format(args.aps_inner))
-            print('Burnin: {}'.format(args.burnin))
-            with timer():
-                d_opt, p_a, psi_da = aps_ara(p.d_values, p.a_values,
-                                                   p.d_util, p.a_util_f, p.prob,
-                                                   p.a_prob_f, N_aps=args.aps,
-                                                   J=args.ara,
-                                                   burnin=args.burnin, p_d=p_a,
-                                                   N_inner=args.aps_inner)
-        else:
-            print('Error')
+@mcmc_app.command("adg")
+def cli_mcmc_adg(iters: int = 100):
 
-        a_opt = pd.Series(p_a.argmax(axis=1), index=d_idx)
-        p_a = pd.DataFrame(p_a, index=d_idx, columns=a_idx)
-        dout = {'d_opt': d_opt, 'psi_da': psi_da, 'p_a': p_a}
+    p = state['p']
 
+    with timer():
+        (d_opt, a_opt,
+         psi_d, psi_d_std,
+         psi_a, psi_a_std, t) = mcmc_adg(p.d_values, p.a_values, p.d_util,
+                                         p.a_util, p.prob, p.prob,
+                                         iters=iters)
+
+    psi_d = pd.DataFrame({'mean': psi_d, 'std': psi_d_std},
+                         index=state['d_idx'])
+    psi_a = pd.DataFrame(np.concatenate((psi_a, psi_a_std), axis=1),
+                         index=state['d_idx'], columns=state['cols'])
+
+    psi_d.to_csv(f'{state["basepath"]}_mcmc_adg_psid.csv')
+    psi_a.to_csv(f'{state["basepath"]}_mcmc_adg_psia.csv')
+
+    typer.echo(a_opt)
+    typer.echo(d_opt)
+
+
+@aps_app.command("adg")
+def cli_aps_adg(iters: int = 10, inner_iters: int = 10, burnin: float = 0.75):
+
+    p = state['p']
+
+    with timer():
+        d_opt, a_opt, psi_d, psi_a = aps_adg(p.d_values, p.a_values, p.d_util,
+                                             p.a_util, p.prob, burnin=burnin,
+                                             N_aps=iters, N_inner=inner_iters)
+
+    pd.Series(psi_d).to_csv(f'{state["basepath"]}_aps_adg_psid.csv',
+                             header=False, index=False)
+
+
+@mcmc_app.command("ara")
+def cli_mcmc_ara(iters: int = 100, ara_iters: int = 10, n_jobs: int = 1):
+
+    p = state['p']
+
+    with timer():
+        (d_opt, p_a,
+         psi_da, psi_da_std,
+         psi_ad, psi_ad_std) = mcmc_ara(p.d_values, p.a_values, p.d_util,
+                                        p.a_util_f, p.prob, p.a_prob_f,
+                                        iters=iters, ara_iters=ara_iters,
+                                        n_jobs=n_jobs)
+
+    psi_d = pd.DataFrame({'mean': psi_da.sum(axis=1),
+                          'std': psi_da_std.sum(axis=1)}, index=state["d_idx"])
+    psi_a = pd.DataFrame(np.concatenate((
+        psi_ad.mean(axis=2),
+        psi_ad_std.mean(axis=2)),
+        axis=1), index=state["d_idx"], columns=state["cols"])
+
+    psi_d.to_csv(f'{state["basepath"]}_mcmc_ara_psid.csv')
+    psi_a.to_csv(f'{state["basepath"]}_mcmc_ara_psia.csv')
+
+    a_opt = pd.Series(p_a.argmax(axis=1), index=state["d_idx"])
+    p_a = pd.DataFrame(p_a, index=state["d_idx"], columns=state["a_idx"])
+
+    p_a.to_csv(f'{state["basepath"]}_mcmc_ara_pa.csv')
+
+    typer.echo(a_opt)
+    typer.echo(d_opt)
+
+
+@aps_app.command("ara")
+def cli_aps_ara(iters: int = 10, inner_iters: int = 10, burnin: float = 0.75,
+                ara_iters: int = 10, pa: str = None):
+
+    p = state['p']
+
+    if pa is not None:
+        p_a = pd.read_pickle(pa).values
     else:
-        print('Error')
-        sys.exit(1)
+        p_a = None
 
-    print("Optimal Defense:", d_opt)
+    with timer():
+        d_opt, p_a, psi_da = aps_ara(p.d_values, p.a_values, p.d_util,
+                                     p.a_util_f, p.prob, p.a_prob_f,
+                                     N_aps=iters, J=ara_iters,
+                                     burnin=burnin, p_d=p_a,
+                                     N_inner=inner_iters)
 
-    fout = '{}/{}_{}_{}.pkl'.format(args.out, args.module, args.alg, args.set)
-    with open(fout, "wb") as f:
-        pickle.dump(dout, f)
+    pd.Series(psi_da).to_csv(f'{state["basepath"]}_aps_ara_psid.csv',
+                             header=False, index=False)
+
+    p_a = pd.DataFrame(p_a, index=state["d_idx"], columns=state["a_idx"])
+    p_a.to_csv(f'{state["basepath"]}_aps_ara_pa.csv')
+
+
+@ann_app.command("adg")
+def cli_ann_adg(iters: int = 10, inner_iters: int = 10, burnin: float = 0.75,
+                temp: int = 5, prec: float = 0.01, mean: bool = True):
+
+    p = state['p']
+
+    with timer():
+        d_opt, psi_d = aps_adg_ann(p.d_util, p.a_util, p.prob, J=temp,
+                                   J_inner=temp, N_aps=iters, burnin=burnin,
+                                   N_inner=inner_iters, prec=prec, mean=mean,
+                                   info=True)
+
+
+if __name__ == '__main__':
+    app()
