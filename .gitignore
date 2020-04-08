@@ -10,3 +10,4 @@ __pycache__/
 *.po*
 .Rproj.user
 .Rhistory
+.RData
