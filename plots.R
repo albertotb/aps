@@ -224,18 +224,22 @@ path <- paste0("results/dist_APS_no_Jtrick.csv")
 path_out <- paste0('img/aps_prob3_no_Jtrick.pdf')
 title <- paste('APS')
 dist <- read.csv(path, header = F)
-mode = getmode(dist$V1)
+burnin <- round(0.20*length(dist$V1))
+dist <- slice(dist, burnin:n())
+mode <- 0
+
 p <- ggplot(dist, aes(x = V1,
                       fill = factor(ifelse(V1 == mode, "Highlighted", "Normal")))) + 
   geom_histogram(aes(y=(..count..)/sum(..count..)), bins = 41, colour="black") +
   scale_fill_manual(name = "area", values=c("red", "white"), guide = FALSE) +
   xlim(0,200) +
   xlab("Defender's Decision") +
-  ylab("Frequency") + 
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggtitle(title)
+  ylab("Frequency") 
+  # theme(plot.title = element_text(hjust = 0.5)) +
+  # ggtitle(title)
 
 p
+ggsave(p, filename = path_out, dpi = dpi, width = width, height = height)
 
 #------------------------------------------------------------------------------
 
