@@ -69,7 +69,7 @@ def prob_a(a, d, params, size=10):
 def prob_d(a, d,  size=1):
     sample = np.zeros([size, 2])
     longitudes = pl(a, d, a_g=5, b_g=1, a_l=4, b_l=1, size=size)
-    m_shares   = pm(longitudes, alpha, beta)
+    m_shares   = pm(longitudes, 0.0026, 0.00417)
     sample[:,0] = longitudes
     sample[:,1] = m_shares
     return sample
