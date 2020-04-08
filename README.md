@@ -24,7 +24,7 @@ The folder structure is the following:
 First example problem
 ---------------------
 
-* Run APS ADG experiment:
+* Run MC ADG experiment:
 
       ./run_exp.py mcmc adg --iters 100000
 
@@ -39,4 +39,14 @@ First example problem
 * Run APS ARA experiment:
 
       ./run_exp.py aps ara --iters 100000 --inner-iters 10000 --ara-iters 5000
+      
+ARA in real problem
+---------------------
+
+* Run APS for ARA cybersecurity problem:
+
+      ./aps_annealing_ara.py
+     
+
+
 
