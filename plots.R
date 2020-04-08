@@ -12,13 +12,26 @@ width <- 8.33
 height <- 5.79
 colors <- c('#ffffb3', '#bebada')
 
-# Data figure 3
+# DATA
 d3a <- read_csv("./results/1584635625_prob1_mcmc_adg_psia.csv", col_types = c(d = "c"))
+d3b <- read.csv("./results/prob1_aps_psia.csv", col.names = 0:9, check.names = FALSE)
+
+d4a <- read_csv("./results/1584635625_prob1_mcmc_adg_psid.csv", col_types = c(d = "c"))
+d4b <- read.csv("./results/prob1_aps_psid.csv", col.names = "d")
+
+d6a <- read_csv('./results/1586190137_prob1_mcmc_ara_pa.csv')
+d6b <- read_csv('./results/1586190090_prob1_aps_ara_pa.csv')
+
+d7a <- read_csv("results/1586190137_prob1_mcmc_ara_psid.csv", col_types = c(d = "c"))
+d7b <- read.csv("results/1586190090_prob1_aps_ara_psid.csv", col.names = "d")
+
+#---------------------------------------------------------------------------------------
+
+# Data figure 3
 d3a_long <- pivot_longer(d3a, -d, 
                          names_to = c(".value", "a"), 
                          names_pattern = "(.*)_(.*)")
 
-d3b <- read.csv("results/prob1_aps_psia.csv", col.names = 0:9, check.names = FALSE)
 d3b_long <- d3b %>% 
   gather(key = "d", value = "a", convert = TRUE) %>%
   mutate(d = factor(d), a = factor(a)) %>%
@@ -42,11 +55,8 @@ ggsave(p3b, filename = "img/prob1_aps_psia.pdf", dpi = dpi, width = width, heigh
 #------------------------------------------------------------------------------
 
 ## Data figure 4
-d4a <- read_csv("./results/1584635625_prob1_mcmc_adg_psid.csv", col_types = c(d = "c"))
-
-dist <- read.csv("results/prob1_aps_psid.csv", col.names = "d")
-d4b <- count(dist, d)
-d4b$freq <- d4b$n/nrow(dist)
+d4b <- count(d4b, d)
+d4b$freq <- d4b$n/nrow(d4b)
 
 # Figure 4
 p4a <- ggplot(d4a, aes(x=d)) +
@@ -67,9 +77,6 @@ ggsave(p4b, filename = "img/prob1_aps_psid.pdf", dpi = dpi, width = width, heigh
 #------------------------------------------------------------------------------
 
 # Data figure 6
-d6a <- read_csv('./results/1586188428_prob1_mcmc_ara_pa.csv')
-d6b <- read_csv('./results/1586188819_prob1_aps_ara_pa.csv')
-
 d6a_long <- d6a %>%
   mutate(d = factor(0:9)) %>%
   gather(-d, key = "a", value = "Expected_Utility", convert = TRUE) %>%
@@ -98,11 +105,8 @@ ggsave(p6b, filename = "img/prob1_pa_ara_aps.pdf", dpi = dpi, width = width, hei
 #------------------------------------------------------------------------------
 
 # Data figure 7
-d7a <- read_csv("results/1584637784_prob1_mcmc_ara_psid.csv", col_types = c(d = "c"))
-
-dist <- read.csv("results/1586189360_prob1_aps_ara_psid.csv", col.names = "d")
-d7b <- count(dist, d)
-d7b$freq <- d7b$n/nrow(dist)
+d7b <- count(d7b, d)
+d7b$freq <- d7b$n/nrow(d7b)
 
 # Figure 7
 p7a <- ggplot(d7a, aes(x = d)) +
