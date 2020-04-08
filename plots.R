@@ -22,8 +22,8 @@ d4b <- read.csv("./results/prob1_aps_psid.csv", col.names = "d")
 d6a <- read_csv('./results/1586190137_prob1_mcmc_ara_pa.csv')
 d6b <- read_csv('./results/1586190090_prob1_aps_ara_pa.csv')
 
-d7a <- read_csv("results/1586190137_prob1_mcmc_ara_psid.csv", col_types = c(d = "c"))
-d7b <- read.csv("results/1586190090_prob1_aps_ara_psid.csv", col.names = "d")
+d7a <- read_csv("./results/1586190137_prob1_mcmc_ara_psid.csv", col_types = c(d = "c"))
+d7b <- read.csv("./results/1586190090_prob1_aps_ara_psid.csv", col.names = "d")
 
 #---------------------------------------------------------------------------------------
 
