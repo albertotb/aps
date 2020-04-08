@@ -8,7 +8,7 @@ The folder structure is the following:
   * `results/`, output files
   * `data/`, problem data files
   * `img/`, figures
-  * `gif/, animated figures
+  * `gif/`, animated figures
   * `aps.py`, implementation of the APS algorithm
   * `aps_annealing.py`, implementation of the APS annealing strategy
   * `mcmc.py`, implementation of the MCMC algorithm
