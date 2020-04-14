@@ -93,15 +93,22 @@ def cli_aps_adg(iters: int = 10, inner_iters: int = 10, burnin: float = 0.75):
 
 
 @mcmc_app.command("ara")
-def cli_mcmc_ara(iters: int = 100, ara_iters: int = 10, n_jobs: int = -1):
+def cli_mcmc_ara(iters: int = 100, ara_iters: int = 10, n_jobs: int = -1,
+pa: str = None):
 
     p = state['p']
+
+    if pa is not None:
+        p_ad = pd.read_csv(pa, index_col=['d']).values
+    else:
+        pass
+
 
     with timer():
         (d_opt, psi_d, p_ad) = mcmc_ara(p.d_values, p.a_values, p.d_util,
                                         p.a_util_f, p.prob, p.a_prob_f,
                                         iters=iters, ara_iters=ara_iters,
-                                        n_jobs=n_jobs)
+                                        n_jobs=n_jobs, p_ad=p_ad)
 
     psi_d = pd.DataFrame(psi_d, index=state["d_idx"])
     p_ad = pd.DataFrame(p_ad, index=state["d_idx"], columns=state["a_idx"])
@@ -124,10 +131,6 @@ def cli_mcmc_ara(iters: int = 100, ara_iters: int = 10, n_jobs: int = -1):
     typer.echo(d_opt)
     '''
 
-
-
-
-
 @aps_app.command("ara")
 def cli_aps_ara(iters: int = 10, inner_iters: int = 10, burnin: float = 0.20,
                 ara_iters: int = 10, pa: str = None, n_jobs: int = -1):
@@ -135,9 +138,10 @@ def cli_aps_ara(iters: int = 10, inner_iters: int = 10, burnin: float = 0.20,
     p = state['p']
 
     if pa is not None:
-        p_ad = pd.read_csv(pa).values
+        p_ad = pd.read_csv(pa, index_col=['d']).values
     else:
-        p_ad = None
+        pass
+
 
 
     with timer():
@@ -151,8 +155,13 @@ def cli_aps_ara(iters: int = 10, inner_iters: int = 10, burnin: float = 0.20,
     pd.Series(psi_d).to_csv(f'{state["basepath"]}_aps_ara_psid.csv',
                              header=False, index=False)
 
-    p_ad = pd.DataFrame(p_ad, index=state["d_idx"], columns=state["a_idx"])
-    p_ad.to_csv(f'{state["basepath"]}_aps_ara_pa.csv')
+    if pa is None:
+        p_ad = pd.DataFrame(p_ad, index=state["d_idx"], columns=state["a_idx"])
+        p_ad.to_csv(f'{state["basepath"]}_aps_ara_pa.csv')
+    else:
+        pass
+
+
 
 
 @ann_app.command("adg")

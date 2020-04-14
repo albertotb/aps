@@ -19,11 +19,11 @@ d3b <- read.csv("./results/1586798776_prob1_aps_adg_psia.csv", col.names = 0:9, 
 d4a <- read_csv("./results/1586784517_prob1_mcmc_adg_psid.csv", col_types = c(d = "c"))
 d4b <- read.csv("./results/1586798776_prob1_aps_adg_psid.csv", col.names = "d")
 
-d6a <- read_csv('./results/1586805597_prob1_mcmc_ara_pa.csv')
-d6b <- read_csv('./results/1586812474_prob1_aps_ara_pa.csv')
+d6a <- read_csv('./results/1586877226_prob1_mcmc_ara_pa.csv')
+d6b <- read_csv('./results/1586874387_prob1_aps_ara_pa.csv')
 
-d7a <- read.csv("./results/1586805597_prob1_mcmc_ara_psid.csv", col.names = c("d", "mean"))
-d7b <- read.csv("./results/1586812474_prob1_aps_ara_psid.csv", col.names = "d")
+d7a <- read.csv("./results/1586865337_prob1_mcmc_ara_psid.csv", col.names = c("d", "mean"))
+d7b <- read.csv("./results/1586865621_prob1_aps_ara_psid.csv", col.names = "d")
 
 #---------------------------------------------------------------------------------------
 
