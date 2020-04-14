@@ -11,14 +11,13 @@ The folder structure is the following:
   * `gif/`, animated figures
   * `aps.py`, implementation of the APS algorithm
   * `aps_annealing.py`, implementation of the APS annealing strategy
+  * `aps_annealing_ara.py`, implementation of the APS annealing strategy with Mullers trick
   * `mcmc.py`, implementation of the MCMC algorithm
   * `plots.R`, script to generate all the plots
   * `prob1_sa.py`, script to perform sensitivity analysis of problem 1
   * `prob3_opt_iters.py`, script to compute optimal number of iterations
   * `prob3_true_sol.py`, script to compute the true solution of a problem
   * `prob3_runtime.py`, compute running time
-  * `aps_ara.py`, run APS for new prob2 ARA
-  * `mc_ara.py `, run MC for new prob2 ARA
   * `run_exp.py`, interface to run the experiments
 
 First example problem
