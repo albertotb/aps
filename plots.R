@@ -13,17 +13,17 @@ height <- 5.79
 colors <- c('#ffffb3', '#bebada')
 
 # DATA
-d3a <- read_csv("./results/1584635625_prob1_mcmc_adg_psia.csv", col_types = c(d = "c"))
-d3b <- read.csv("./results/prob1_aps_psia.csv", col.names = 0:9, check.names = FALSE)
+d3a <- read_csv("./results/1586784517_prob1_mcmc_adg_psia.csv", col_types = c(d = "c"))
+d3b <- read.csv("./results/1586798776_prob1_aps_adg_psia.csv", col.names = 0:9, check.names = FALSE)
 
-d4a <- read_csv("./results/1584635625_prob1_mcmc_adg_psid.csv", col_types = c(d = "c"))
-d4b <- read.csv("./results/prob1_aps_psid.csv", col.names = "d")
+d4a <- read_csv("./results/1586784517_prob1_mcmc_adg_psid.csv", col_types = c(d = "c"))
+d4b <- read.csv("./results/1586798776_prob1_aps_adg_psid.csv", col.names = "d")
 
-d6a <- read_csv('./results/1586190137_prob1_mcmc_ara_pa.csv')
-d6b <- read_csv('./results/1586190090_prob1_aps_ara_pa.csv')
+d6a <- read_csv('./results/1586805597_prob1_mcmc_ara_pa.csv')
+d6b <- read_csv('./results/1586812474_prob1_aps_ara_pa.csv')
 
-d7a <- read_csv("./results/1586190137_prob1_mcmc_ara_psid.csv", col_types = c(d = "c"))
-d7b <- read.csv("./results/1586190090_prob1_aps_ara_psid.csv", col.names = "d")
+d7a <- read.csv("./results/1586805597_prob1_mcmc_ara_psid.csv", col.names = c("d", "mean"))
+d7b <- read.csv("./results/1586812474_prob1_aps_ara_psid.csv", col.names = "d")
 
 #---------------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ d3b_long <- d3b %>%
 # Figure 3
 p3a <- ggplot(d3a_long, aes(x = d, y = mean, fill = a)) +
   geom_col(position = "dodge", color="black") +
-  geom_errorbar(aes(ymin = mean-std, ymax = mean+std), width=.2, position=position_dodge(.9)) +
+  #geom_errorbar(aes(ymin = mean-std, ymax = mean+std), width=.2, position=position_dodge(.9)) +
   scale_fill_manual(values=colors) +
   ylab("Expected Utility")
 
@@ -61,7 +61,7 @@ d4b$freq <- d4b$n/nrow(d4b)
 # Figure 4
 p4a <- ggplot(d4a, aes(x=d)) +
   geom_col(aes(y = mean)) +
-  geom_errorbar(aes(ymax = mean+std, ymin = mean-std), width=.2) +
+  #geom_errorbar(aes(ymax = mean+std, ymin = mean-std), width=.2) +
   xlab("Optimal Decision") +
   ylab("Expected Utility")
 
@@ -105,17 +105,17 @@ ggsave(p6b, filename = "img/prob1_pa_ara_aps.pdf", dpi = dpi, width = width, hei
 #------------------------------------------------------------------------------
 
 # Data figure 7
-d7b <- count(d7b, d)
-d7b$freq <- d7b$n/nrow(d7b)
+d7b_proc <- count(d7b, d)
+d7b_proc$freq <- d7b_proc$n/nrow(d7b)
 
 # Figure 7
 p7a <- ggplot(d7a, aes(x = d)) +
   geom_col(aes(y = mean), colour="black", fill = "white") +
-  geom_errorbar(aes(ymax = mean+std, ymin = mean-std), width = 0.2) +
+  #geom_errorbar(aes(ymax = mean+std, ymin = mean-std), width = 0.2) +
   xlab("Optimal Decision") +
   ylab("Expected Utility")
 
-p7b <- ggplot(d7b, aes(x = d, y = freq))+ 
+p7b <- ggplot(d7b_proc, aes(x = d, y = freq))+ 
   geom_bar(stat="identity", colour="black", fill = "white") +
   xlab("Optimal Decision") +
   ylab("Frequency") +
@@ -207,7 +207,7 @@ J_grid = seq(500, 9500, by = 500)
 for(J in J_grid){
   path <- paste0("results/dist_APS_J", as.character(J), '.csv')
   path_out <- paste0("img/aps_prob3_J", as.character(J), '.pdf')
-  title <- paste('APS. Inverse Temperature', as.character(J))
+  title <- paste('H =', as.character(J))
   dist <- read.csv(path, header = F)
   mode = getmode(dist$V1)
   p <- ggplot(dist, aes(x = V1,

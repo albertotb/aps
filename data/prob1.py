@@ -16,8 +16,8 @@ theta_values = data['theta'].unique()
 #alpha_values = data['alpha'].dropna().values
 #beta_values = data['beta'].dropna().values
 
-alpha_values = data['alpha'].dropna().values / 100
-beta_values = data['beta'].dropna().values / 100
+alpha_values = data['alpha'].dropna().values # / 100
+beta_values = data['beta'].dropna().values # / 100
 
 # Important to set the index in this order and sort it before the reshape
 data = data.set_index(['d', 'a', 'theta'])
@@ -39,6 +39,7 @@ C = 0.4
 #UD_MAX = 0.0
 UD_MAX = np.exp(cd.max()*C)
 
+
 # Define utility model
 ud = lambda cd, c=1: -np.exp(c*cd)
 ua = lambda ca, e=1:  np.exp(e*ca)
@@ -51,10 +52,10 @@ def a_util_f():
     e=uniform.rvs(scale=2)
     return lambda a, theta: ua(ca[a, theta], e = e)
 
-def a_prob_f(d=None):
-    p1 = beta.rvs(a=alpha_values[d], b=beta_values[d])
+def a_prob_f():
+    p1 = beta.rvs(a=alpha_values, b=beta_values)
     def a_prob(d, a, size=1):
-        return bernoulli.rvs(p=p1,
+        return bernoulli.rvs(p=p1[d == d_values],
                              size=size) if a==1 else np.zeros(size, dtype=int)
     return a_prob
 

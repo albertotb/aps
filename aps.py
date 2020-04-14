@@ -147,7 +147,8 @@ def aps_adg(d_values, a_values, d_util, a_util, theta, N_aps=1000,
 
 
 def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
-            N_aps=1000, burnin=0.75, N_inner = 1000, J = 100, p_d = None, verbose=False):
+            N_aps=1000, burnin=0.20, N_inner = 1000, ara_iters = 100,
+            n_jobs = -1, p_ad = None, verbose=False):
     """ Computes the solution of ARA using MCMC
 
         Parameters
@@ -192,31 +193,63 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
             Number of iterations for the APS algorithm
         burnin : float, optional (default=0.75)
             Percentage of burn-in iterations in the APS and APS inner algorithms
-        J : int, optional (default=100)
+        ara_iters : int, optional (default=100)
             Number of inner iterations to compute the random optimal
             attacks distribution
     """
+
+    def solve_attacker_aps(d, a_util, a_prob, iters, burnin):
+        a_sim = np.zeros(iters, dtype = int)
+        a_sim[0] = np.random.choice(a_values)
+        theta_sim = a_prob(d, a_sim[0])
+
+        for i in range(1, iters):
+            ## Update a
+            a_tilde = propose(a_sim[i-1], a_values)
+            theta_tilde = a_prob(d, a_tilde)
+
+            num = a_util(a_tilde, theta_tilde)
+            den = a_util(a_sim[i-1], theta_sim)
+
+            if np.random.uniform() <= num/den:
+                a_sim[i] = a_tilde
+                theta_sim = theta_tilde
+            else:
+                a_sim[i] = a_sim[i-1]
+
+        a_dist = a_sim[int(burnin*iters):]
+        return(mode(a_dist)[0][0])
+
+    def ara_iter(d, K, iters, burnin):
+
+        def wrapper():
+            ##
+            a_prob = a_prob_f()
+            a_util = a_util_f()
+            ##
+            return solve_attacker_aps(d, a_util, a_prob, iters, burnin)
+
+        with Parallel(n_jobs=n_jobs) as parallel:
+            result = parallel(delayed(wrapper)() for k in range(K))
+
+        result = np.array(result)
+        return np.bincount(result.astype('int'), minlength=len(a_values))  / K
+
+    def compute_p_ad(K, iters, burnin):
+        p_ad = np.zeros([len(d_values),len(a_values)])
+        ##
+        for i,d in enumerate(d_values):
+            print(d)
+            p_ad[i] = ara_iter(d, K, iters, burnin)
+        return p_ad
+
     ## Compute a* for all d
-    if not p_d:
-        if verbose:
-            print("PREPROCESSING...")
-        p_d = np.zeros((len(d_values), len(a_values)), dtype=float)
-
-        for i, d_given in enumerate(d_values):
-            def wrapper(d_given, a_values, N_inner, burnin):
-                a_util = a_util_f()
-                a_prob = a_prob_f(d_given)
-                return innerAPS(d_given, a_values, a_util, a_prob, N_inner, burnin)
-
-            with Parallel(n_jobs=8) as parallel:
-                results = parallel(delayed(wrapper)(d_given, a_values, N_inner, burnin) for jj in range(J))
-
-            modes = np.fromiter(map(lambda t: t[0], results), dtype=int)
-            p_d[i, :] = np.bincount(modes, minlength = len(a_values))/J
+    if p_ad is None:
+        p_ad = compute_p_ad(ara_iters, N_inner, burnin)
 
     d_sim = np.zeros(N_aps, dtype = int)
     d_sim[0] = np.random.choice(d_values)
-    a_sim = np.random.choice(a_values, p=p_d[d_values == d_sim[0], :][0])
+    a_sim = np.random.choice(a_values, p=p_ad[d_values == d_sim[0], :][0])
     theta_sim = theta_d(d_sim[0], a_sim)
 
     if verbose:
@@ -225,7 +258,7 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
     for i in range(1,N_aps):
         ## Update d
         d_tilde = propose(d_sim[i-1], d_values)
-        a_tilde = np.random.choice(a_values, p=p_d[d_values == d_tilde, :][0])
+        a_tilde = np.random.choice(a_values, p=p_ad[d_values == d_tilde, :][0])
         theta_tilde = theta_d(d_tilde, a_tilde)
 
         num = d_util(d_tilde, theta_tilde)
@@ -245,4 +278,4 @@ def aps_ara(d_values, a_values, d_util, a_util_f, theta_d, a_prob_f,
                 print(i)
 
     d_dist = d_sim[int(burnin*N_aps):]
-    return(mode(d_dist)[0], p_d, d_dist)
+    return(mode(d_dist)[0], p_ad, d_dist)

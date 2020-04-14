@@ -67,7 +67,7 @@ def mcmc_adg(d_values, a_values, d_util, a_util, d_prob, a_prob,
 
 
 def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
-             iters=1000, ara_iters=1000, n_jobs=1):
+             iters=1000, ara_iters=1000, n_jobs=1, p_ad=None):
     """ Computes the solution of ARA using MCMC
 
         Parameters
@@ -113,37 +113,47 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
         m : int, optional (default=100)
             Number of inner iterations for the Montecarlo algorithm
     """
-    psi_d = np.zeros((len(d_values), len(a_values)), dtype=float)
-    psi_d_std = np.zeros((len(d_values), len(a_values)), dtype=float)
-    p_a = np.zeros((len(d_values), len(a_values)), dtype=float)
-    psi_a = np.zeros((len(d_values), len(a_values), ara_iters), dtype=float)
-    psi_a_std = np.zeros((len(d_values), len(a_values), ara_iters), dtype=float)
+    def solve_attacker_mc(d, a_util, a_prob, iters):
+        #
+        psi_a = np.zeros((len(a_values)), dtype=float)
+        for i, a in enumerate(a_values):
+            theta = a_prob(d, a, size=iters)
+            psi_a[i] = a_util(a, theta).mean()
+        a_opt = a_values[psi_a.argmax()]
+        return a_opt
 
+    def ara_iter(d, K, iters):
+
+        def wrapper():
+            ##
+            a_prob = a_prob_f()
+            a_util = a_util_f()
+            ##
+            return solve_attacker_mc(d, a_util, a_prob, iters)
+
+        with Parallel(n_jobs=n_jobs) as parallel:
+            result = parallel(delayed(wrapper)() for k in range(K))
+
+        result = np.array(result)
+        return np.bincount(result.astype('int'), minlength=len(a_values))  / K
+
+    def compute_p_ad(K, iters):
+        p_ad = np.zeros([len(d_values),len(a_values)])
+        ##
+        for i,d in enumerate(d_values):
+            p_ad[i] = ara_iter(d, K, iters)
+        return p_ad
+
+    if p_ad is None:
+        p_ad = compute_p_ad(ara_iters, iters)
+
+    psi_d = np.zeros((len(d_values)), dtype=float)
+    ##
     for i, d in enumerate(d_values):
-        for j, a in enumerate(a_values):
-            def wrapper():
-                a_util = a_util_f()
-                a_prob = a_prob_f(d=d)
-                theta_k = a_prob(d, a, size=iters)
-                return (a_util(a, theta_k).mean(),
-                        a_util(a, theta_k).std() / sqrt(iters))
+        sample = np.random.choice(a_values, p = p_ad[i], size = iters)
+        theta_d = np.array([d_prob(d, a) for a in sample])[:,0]
+        psi_d[i] = d_util(d, theta_d).mean()
+    d_opt = d_values[psi_d.argmax()]
 
-            with Parallel(n_jobs=n_jobs) as parallel:
-                results = parallel(delayed(wrapper)() for k in range(ara_iters))
 
-            avg = list(zip(*results))[0]
-            std = list(zip(*results))[1]
-
-            psi_a[i, j, :] = np.array(avg)
-            psi_a_std[i, j, :] = np.array(std)
-
-        p_a[i, :] = (np.bincount(psi_a[i, :, :].argmax(axis=0),
-                                 minlength=len(a_values)) / ara_iters)
-
-        for j, a in enumerate(a_values):
-            theta_d = d_prob(d, a, size=iters)
-            psi_d[i, j] = (d_util(d, theta_d)*p_a[i, j]).mean()
-            psi_d_std[i, j] = (d_util(d, theta_d)*p_a[i, j]).std() / sqrt(iters)
-
-    d_opt = d_values[psi_d.sum(axis=1).argmax()]
-    return d_opt, p_a, psi_d, psi_d_std, psi_a, psi_a_std
+    return d_opt, psi_d, p_ad
