@@ -106,7 +106,7 @@ def solve_defender_nt(N, p_ad, propose):
     ##
     for i, n in enumerate(N_grid):
 
-        d_sim[i], theta_sim = iter_mcmc(J, propose, d_sim[i-1], theta_sim, p_ad)
+        d_sim[i], theta_sim = iter_mcmc_defender(J, propose, d_sim[i-1], theta_sim, p_ad)
         if n%10000 == 0:
             print( n/N )
 
@@ -127,7 +127,7 @@ def solve_defender(J_max, p_ad, propose):
     ##
     for i, J in enumerate(J_grid):
 
-        d_sim[i], theta_sim = iter_mcmc(J, propose, d_sim[i-1], theta_sim, p_ad)
+        d_sim[i], theta_sim = iter_mcmc_defender(J, propose, d_sim[i-1], theta_sim, p_ad)
         theta_sim = np.append(theta_sim, np.random.choice(theta_sim))
         if J%500 == 0:
             print(i)
@@ -152,7 +152,7 @@ if __name__ == '__main__':
 
     #
     p_ad = pd.read_csv('results/p_ad.csv', index_col='Unnamed: 0').values
-    
+
     # N = 10000000
     # solve_defender_nt(N, p_ad, propose)
 

@@ -262,3 +262,37 @@ p <- ggplot(data = pd_melted, aes(x = factor(variable), y = value)) +
   ylab("p(a|d)")
 
 ggsave(p, filename = "img/pa_given_d_new.pdf", dpi = dpi, width = width, height = height)
+
+
+#------------------------------------------------------------------------------
+# Electronic Companion for Problem 1
+#------------------------------------------------------------------------------
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+# APS solution real problem with Temperature
+J_grid = seq(10, 490, by = 10)
+for(J in J_grid){
+  path <- paste0("results/prob1_EC/prob1_adg_peaked", as.character(J), '.csv')
+  path_out <- paste0("img/prob1_EC/prob1_adg_peaked", as.character(J), '.pdf')
+  title <- paste('H =', as.character(J))
+  dist <- read.csv(path, header = F)
+  mode = getmode(dist$V1)
+  count_dist <- count(dist, V1)
+  count_dist$freq <- count_dist$n/nrow(count_dist)
+  p <- ggplot(count_dist, aes(x=V1, y=freq, 
+                              fill = factor(ifelse(V1 == mode, "Highlighted", "Normal"))) )+
+    geom_bar(stat="identity", colour = "black") +
+    scale_fill_manual(name = "area", values=c("red", "white"), guide = FALSE) +
+    xlab("Defender's Decision") +
+    ylab("Frequency") +
+    scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0)) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    ggtitle(title)
+    
+  ggsave(p, filename = path_out, dpi = dpi, width = width, height = height)
+}
+
+#------------------------------------------------------------------------------
