@@ -128,10 +128,12 @@ def solve_defender(J_max, p_ad, propose):
     for i, J in enumerate(J_grid):
 
         d_sim[i], theta_sim = iter_mcmc_defender(J, propose, d_sim[i-1], theta_sim, p_ad)
-        theta_sim = np.append(theta_sim, np.random.choice(theta_sim))
+        idx = np.random.choice( np.arange(0, theta_sim.shape[0]) )
+        theta_sim = np.vstack( [theta_sim, theta_sim[idx]] )
         if J%500 == 0:
             print(i)
             burnin = int(0.2*i)
+            print(mode(d_sim[burnin:i])[0][0])
             dist = pd.Series(d_sim[burnin:i])
             name = 'results/dist_APS_J' + str(J) + '.csv'
             dist.to_csv(name, index = False)
@@ -140,7 +142,7 @@ if __name__ == '__main__':
 
     p = import_module(f'data.prob2_new')
 
-    if not os.path.isfile('results/p_ad.csv'):
+    if not os.path.isfile('results/p_ad3.csv'):
 
         K=1000
         iters=2000

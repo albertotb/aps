@@ -2,6 +2,7 @@
 import data.prob3 as p
 from mcmc import *
 from joblib import Parallel, delayed
+import numpy as np
 
 disc   = 0.001
 times  = 30
