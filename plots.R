@@ -148,6 +148,9 @@ p <- ggplot(dist, aes(x = pert_dec)) +
 ggsave(p, filename = "img/hist_sa2.pdf", dpi = dpi, width = width, height = height)
 
 #------------------------------------------------------------------------------
+# volver al esquema de colores anterior
+#colors <- c("red", "white")
+#------------------------------------------------------------------------------
 
 # APS solution real problem
 dist <- read.csv("results/dist_APS.csv")
