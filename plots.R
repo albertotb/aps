@@ -288,10 +288,11 @@ getmode <- function(v) {
 }
 
 # APS solution real problem with Temperature
-J_grid = seq(10, 490, by = 10)
+#J_grid = seq(10, 490, by = 10)
+J_grid <- c(450)
 for(J in J_grid){
   path <- paste0("results/prob1/prob1_adg_peaked", as.character(J), '.csv')
-  path_out <- paste0("img/prob1/prob1_adg_peaked", as.character(J), '.pdf')
+  path_out <- paste0("img/prob1_adg_peaked", as.character(J), '.pdf')
   title <- paste('H =', as.character(J))
   dist <- read.csv(path, header = F)
   mode = getmode(dist$V1)
@@ -318,7 +319,7 @@ for(J in J_grid){
 J_grid <- c(450)
 for(J in J_grid){
   path <- paste0("results/prob1/prob1_ara_peaked", as.character(J), '.csv')
-  path_out <- paste0("img/prob1/prob1_ara_peaked", as.character(J), '.pdf')
+  path_out <- paste0("img/prob1_ara_peaked", as.character(J), '.pdf')
   title <- paste('H =', as.character(J))
   dist <- read.csv(path, header = F)
   mode = getmode(dist$V1)
