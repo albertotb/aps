@@ -13,7 +13,7 @@ height <- 5.79
 colors <- c('#ffffb3', '#bebada')
 
 # DATA
-path <- "./results/prob1"
+path <- "./results"
 d3a <- read_csv(file.path(path, "1586784517_prob1_mcmc_adg_psia.csv"), col_types = c(d = "c"))
 d3b <- read.csv(file.path(path, "1586798776_prob1_aps_adg_psia.csv"), col.names = 0:9, check.names = FALSE)
 
@@ -23,8 +23,8 @@ d4b <- read.csv(file.path(path, "1586798776_prob1_aps_adg_psid.csv"), col.names 
 d6a <- read_csv(file.path(path, "1586877226_prob1_mcmc_ara_pa.csv"))
 d6b <- read_csv(file.path(path, "1586874387_prob1_aps_ara_pa.csv"))
 
-d7a <- read.csv(file.path(path, "1586865337_prob1_mcmc_ara_psid.csv"), col.names = c("d", "mean"))
-d7b <- read.csv(file.path(path, "1586865621_prob1_aps_ara_psid.csv"), col.names = "d")
+d7a <- read.csv(file.path(path, "1586878451_prob1_mcmc_ara_psid.csv"), col.names = c("d", "mean"))
+d7b <- read.csv(file.path(path, "1586878163_prob1_aps_ara_psid.csv"), col.names = "d")
 
 #---------------------------------------------------------------------------------------
 
@@ -219,7 +219,7 @@ getmode <- function(v) {
 }
 
 # APS solution real problem with Temperature
-J_grid = seq(1000, 9500, by = 500)
+J_grid = seq(500, 9500, by = 500)
 for(J in J_grid){
   path <- paste0("results/dist_APS_J", as.character(J), '.csv')
   path_out <- paste0("img/aps_prob3_J", as.character(J), '.pdf')
@@ -292,15 +292,23 @@ getmode <- function(v) {
 
 # APS solution real problem with Temperature
 #J_grid = seq(10, 490, by = 10)
+
+path <- paste0("results/prob1_EC/prob1_adg_peaked", as.character(450), '.csv')
+title <- paste('H =', as.character(J))
+dist <- read.csv(path, header = F)
+mode = getmode(dist$V1)
+count_dist <- count(dist, V1)
+count_dist$freq <- count_dist$n/nrow(dist)
+
 J_grid <- c(450)
 for(J in J_grid){
-  path <- paste0("results/prob1/prob1_adg_peaked", as.character(J), '.csv')
-  path_out <- paste0("img/prob1_adg_peaked", as.character(J), '.pdf')
+  path <- paste0("results/prob1_EC/prob1_adg_peaked", as.character(J), '.csv')
+  path_out <- paste0("img/prob1_EC/ec_prob1_adg_peaked", as.character(J), '.pdf')
   title <- paste('H =', as.character(J))
   dist <- read.csv(path, header = F)
   mode = getmode(dist$V1)
   count_dist <- count(dist, V1)
-  count_dist$freq <- count_dist$n/nrow(count_dist)
+  count_dist$freq <- count_dist$n/nrow(dist)
   p <- ggplot(count_dist, aes(x=V1, y=freq, 
                               fill = factor(ifelse(V1 == mode, "Highlighted", "Normal"))) )+
     geom_bar(stat="identity", colour = "black") +
@@ -309,7 +317,7 @@ for(J in J_grid){
     ylab("Frequency") +
     scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0)) +
     theme(plot.title = element_text(hjust = 0.5), text = element_text(size=20)) +
-    ggtitle(title) + 
+    ggtitle(title) 
     
   ggsave(p, filename = path_out, dpi = dpi, width = width, height = height)
 }
@@ -321,13 +329,13 @@ for(J in J_grid){
 #J_grid = seq(10, 490, by = 10)
 J_grid <- c(450)
 for(J in J_grid){
-  path <- paste0("results/prob1/prob1_ara_peaked", as.character(J), '.csv')
-  path_out <- paste0("img/prob1_ara_peaked", as.character(J), '.pdf')
+  path <- paste0("results/prob1_EC/prob1_ara_peaked", as.character(J), '.csv')
+  path_out <- paste0("img/prob1_EC/ec_prob1_ara_peaked", as.character(J), '.pdf')
   title <- paste('H =', as.character(J))
   dist <- read.csv(path, header = F)
   mode = getmode(dist$V1)
   count_dist <- count(dist, V1)
-  count_dist$freq <- count_dist$n/nrow(count_dist)
+  count_dist$freq <- count_dist$n/nrow(dist)
   p <- ggplot(count_dist, aes(x=V1, y=freq, 
                               fill = factor(ifelse(V1 == mode, "Highlighted", "Normal"))) )+
     geom_bar(stat="identity", colour = "black") +
@@ -340,5 +348,65 @@ for(J in J_grid){
   
   ggsave(p, filename = path_out, dpi = dpi, width = width, height = height)
 }
+
+d6a <- read_csv("results/prob1_EC/1586853619_prob1_mcmc_ara_pa.csv")
+d6b <- read_csv("results/prob1_EC/1586853590_prob1_aps_ara_pa.csv")
+
+d7a <- read.csv("results/prob1_EC/1586865337_prob1_mcmc_ara_psid.csv", col.names = c("d", "mean"))
+d7b <- read.csv("results/prob1_EC/1586865621_prob1_aps_ara_psid.csv", col.names = "d")
+
+# Data figure 6
+d6a_long <- d6a %>%
+  mutate(d = factor(0:9)) %>%
+  gather(-d, key = "a", value = "Expected_Utility", convert = TRUE) %>%
+  mutate(a = factor(a))
+
+d6b_long <- d6b %>%
+  mutate(d = factor(0:9)) %>%
+  gather(-d, key = "a", value = "Frequency", convert = TRUE) %>%
+  mutate(a = factor(a))
+
+# Figure 6
+exp = TeX("p_D(a|d)")
+p6a <- ggplot(d6a_long, aes(x = d, y = Expected_Utility, fill = a)) +
+  geom_col(position = "dodge", color = "black") +
+  ylab(exp) +
+  scale_fill_manual(values = colors) + 
+  theme(text = element_text(size=20))
+
+p6b <- ggplot(d6b_long, aes(x = d, y = Frequency, fill = a)) +
+  geom_col(position = "dodge", color = "black") +
+  ylab(exp) +
+  scale_fill_manual(values = colors) + 
+  theme(text = element_text(size=20))
+
+ggsave(p6a, filename = "img/prob1_EC/ec_prob1_pa_ara_mc.pdf", dpi = dpi, width = width, height = height)
+ggsave(p6b, filename = "img/prob1_EC/ec_prob1_pa_ara_aps.pdf", dpi = dpi, width = width, height = height)
+
+#------------------------------------------------------------------------------
+
+# Data figure 7
+d7b_proc <- count(d7b, d)
+d7b_proc$freq <- d7b_proc$n/nrow(d7b)
+
+# Figure 7
+p7a <- ggplot(d7a, aes(x = d)) +
+  geom_col(aes(y = mean), colour = "black", fill = colors[2]) +
+  #geom_errorbar(aes(ymax = mean+std, ymin = mean-std), width = 0.2) +
+  xlab("Optimal Decision") +
+  ylab("Expected Utility") + 
+  theme(text = element_text(size=20))
+
+p7b <- ggplot(d7b_proc, aes(x = d, y = freq))+ 
+  geom_bar(stat="identity", colour = "black", fill = colors[2]) +
+  xlab("Optimal Decision") +
+  ylab("Frequency") +
+  scale_x_continuous(limits = c(-1,10), breaks = seq(0, 9, by = 1), expand=c(0,0)) + 
+  theme(text = element_text(size=20))
+
+ggsave(p7a, filename = "img/prob1_EC/ec_prob1_mc_psid_ara.pdf", dpi = dpi, width = width, height = height)
+ggsave(p7b, filename = "img/prob1_EC/ec_prob1_aps_psid_ara.pdf", dpi = dpi, width = width, height = height)
+
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
