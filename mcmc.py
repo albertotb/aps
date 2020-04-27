@@ -147,6 +147,7 @@ def mcmc_ara(d_values, a_values, d_util, a_util_f, d_prob, a_prob_f,
     if p_ad is None:
         p_ad = compute_p_ad(ara_iters, iters)
     else:
+        pass
 
     psi_d = np.zeros((len(d_values)), dtype=float)
     ##
