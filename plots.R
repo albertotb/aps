@@ -273,7 +273,7 @@ pd_melted <- pd %>%
 
 p <- ggplot(data = pd_melted, aes(x = factor(variable), y = value)) +
   geom_bar(stat = "identity", colour = "black", fill = colors[2]) +
-  scale_x_discrete(breaks = seq(0, 30, 2)) +
+  scale_x_discrete(breaks = seq(0, 30, 3)) +
   facet_wrap(~ d, nrow = 2) +
   xlab("Attacker's Decision") +
   ylab("p(a|d)") + 
