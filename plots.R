@@ -142,7 +142,7 @@ p <- ggplot(dist, aes(x = pert_dec)) +
   geom_bar(aes(y = (..count..)/sum(..count..)), position = "dodge", color = "black", fill = colors[2]) +
   xlab("Optimal Decision") +
   scale_x_continuous(breaks = 0:9) +
-  ylab("Density") + 
+  ylab("Frequency") + 
   theme(text = element_text(size=20))
 
 ggsave(p, filename = "img/hist_sa2.pdf", dpi = dpi, width = width, height = height)
