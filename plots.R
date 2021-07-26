@@ -7,6 +7,12 @@ library(dplyr)
 library(latex2exp)
 library(readr)
 
+
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
 dpi <- 300
 width <- 8.33
 height <- 5.79
@@ -169,9 +175,12 @@ ggsave(p, filename = "img/aps_prob3.pdf", dpi = dpi, width = width, height = hei
 
 # Expected utility time comparison problem
 psi_d <- read.csv("results/EU_timecompprob.csv")
+mode <- psi_d$d[psi_d$EU == max(psi_d$EU)]
 
-p <- ggplot(psi_d, aes(x = d, y = EU)) +
-  geom_bar(stat="identity", colour = "black", fill = colors[2]) +
+p <- ggplot(psi_d, aes(x = d, y = EU, 
+            fill = factor(ifelse(d == mode, "Highlighted", "Normal")))) +
+  geom_bar(stat="identity", colour = "black") +
+  scale_fill_manual(name = "area", values = colors, guide = "none")  +
   xlab("Defender's Decision") +
   ylab("Defender's Expected Utility") + 
   theme(text = element_text(size=20))
@@ -213,10 +222,6 @@ ggsave(p, filename = "img/pa_given_d.pdf", dpi = dpi, width = width, height = he
 
 #------------------------------------------------------------------------------
 
-getmode <- function(v) {
-  uniqv <- unique(v)
-  uniqv[which.max(tabulate(match(v, uniqv)))]
-}
 
 # APS solution real problem with Temperature
 J_grid = seq(500, 9500, by = 500)
